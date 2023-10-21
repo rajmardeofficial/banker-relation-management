@@ -360,7 +360,7 @@ router.get("/tracklead", authenticateToken, bankerCheck, async (req, res) => {
   }
 });
 
-router.get("/editLead/:id/:serviceId", async (req, res) => {
+router.get("/editLead/:id/:serviceId",authenticateToken, bankerCheck, async (req, res) => {
   try {
     const id = req.params.id;
     const serviceId = req.params.serviceId;
@@ -401,7 +401,7 @@ router.get("/editLead/:id/:serviceId", async (req, res) => {
 });
 
 // Download excel sheet here
-router.get("/download", async (req, res) => {
+router.get("/download",authenticateToken, bankerCheck, async (req, res) => {
   try {
     // Fetch leads data from the database
     const leads = await Lead.find();
@@ -451,16 +451,16 @@ router.post("/forgotpassword", (req, res) => {
 });
 
 //change password
-router.post("/changePassword", authenticateToken, (req, res) => {
+router.post("/changePassword", authenticateToken, bankerCheck, (req, res) => {
   changepassword(Banker, req, res, req.banker.id);
 });
 
 //See profile
-router.get("/profile", authenticateToken, (req, res) => {
+router.get("/profile",authenticateToken, bankerCheck,(req, res) => {
   Banker.findById(req.banker.id).then((banker) => {
     RM.findById(banker.rm).then((rm) => {
       console.log(rm);
-      res.render("Profile/profile", { banker, rm });
+      res.render("Profile/Profile", { banker, rm });
     });
   });
 });

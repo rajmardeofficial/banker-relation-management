@@ -334,7 +334,7 @@ router.get("/updateService", authenticateToken, adminCheck, (req, res) => {
 
 //Get req to update service
 router.get("/changePassword", authenticateToken, adminCheck, (req, res) => {
-  res.render("changePassword/changepassword");
+  res.render("ChangePassword/changepassword");
 });
 
 // See Associated banker

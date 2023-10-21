@@ -11,19 +11,20 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
-const routerAdmin = require("./Routes/adminrouter");
-const routerBanker = require("./Routes/bankerrouter");
-const routerRM = require("./Routes/rmrouter");
-
-// Set EJS as the view engine
-// app.set("view engine", "ejs");
-console.log(__dirname);
-
 // Set EJS as the view engine
 app.set("view engine", "ejs");
 
 // Serve static assets (e.g., CSS and JavaScript) from the public folder
 app.use(express.static('public'))
+
+
+const routerAdmin = require("./Routes/adminrouter");
+const routerBanker = require("./Routes/bankerrouter");
+const routerRM = require("./Routes/rmrouter");
+
+// Set EJS as the view engine
+// app.set("view engine", "ejs")
+
 
 app.use("/admin", routerAdmin);
 app.use("/banker", routerBanker);

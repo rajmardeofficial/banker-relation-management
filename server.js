@@ -4,18 +4,24 @@ const https = require("https");
 const path = require("path");
 const fs = require("fs");
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 require("./db conn/connection");
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
-// Set EJS as the view engine
-app.set("view engine", "ejs");
+// // Set EJS as the view engine
+// app.set("view engine", "ejs");
+
+// Define the path to your frontend views folder
+app.set("views", path.join(__dirname, "backend", "FrontEnd", "views"));
+
+// // Serve static assets (e.g., CSS and JavaScript) from the public folder
+// app.use(express.static('public'))
 
 // Serve static assets (e.g., CSS and JavaScript) from the public folder
-app.use(express.static('public'))
+app.use(express.static(path.join(__dirname, "backend", "FrontEnd", "public")));
 
 
 const routerAdmin = require("./Routes/adminrouter");

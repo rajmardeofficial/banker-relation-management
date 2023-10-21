@@ -33,8 +33,12 @@
           <% const name = banker.firstName + " " + banker.lastName %>
           <p><strong>Name: </strong><%= name %></p>
           <p><strong>PAN Number:</strong> <%= banker.pan %></p>
-          <% const rmName = rm.firstName + " " + rm.lastName %>
+
+          <% if(rm){ %> <% const rmName = rm.firstName + " " + rm.lastName %>
           <p><strong>Relationship Manager:</strong> <%= rmName %></p>
+          <% } else { %>
+          <p><strong>Relationship Manager:</strong> No Rm</p>
+          <% }%>
         </div>
       </div>
 

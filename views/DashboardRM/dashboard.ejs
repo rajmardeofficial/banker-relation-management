@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>RM Dashboard</title>
+    <!-- Add your stylesheets or any other head elements here -->
+    <style>
+      /* Add your existing CSS styles here */
+
+      /* Style for desktop */
+      .button-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+
+      .dashboard-button {
+        text-decoration: none;
+        color: white;
+        background-color: #3498db;
+        padding: 10px 20px;
+        border-radius: 5px;
+      }
+
+      /* Media query for tablets */
+      @media screen and (max-width: 768px) {
+        .button-container {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .dashboard-button {
+          margin-top: 10px;
+        }
+      }
+
+      /* Media query for mobile devices */
+      @media screen and (max-width: 480px) {
+        .dashboard-button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <div class="app-content">
+        <div class="app-content-header">
+          <h1 class="app-content-headerText">RM Dashboard</h1>
+          <div class="button-container">
+            <!-- Create Lead Button -->
+            <a href="/rm/createLead" class="dashboard-button">Create Lead</a>
+            <!-- Track Lead Button -->
+            <a href="/rm/trackLead" class="dashboard-button">Track Lead</a>
+            <!-- Logout Button -->
+            <a href="/rm/logout" class="dashboard-button">Logout</a>
+          </div>
+        </div>
+        <!-- Other content of your dashboard can be added here -->
+      </div>
+    </div>
+    <!-- Add your scripts or any other body elements here -->
+  </body>
+</html>

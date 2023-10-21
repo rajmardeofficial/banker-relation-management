@@ -1,0 +1,75 @@
+:root {
+    --white: #fff;
+    --dark-blue: #4682A9;
+    --light-blue: #749BC2;
+}
+
+body {
+    background-color: var(--white);
+    font-family: Arial, sans-serif;
+    margin: 0;
+}
+
+.wrapper {
+    display: flex;
+}
+
+/* Adjustments for sidebar */
+.wrapper > div {
+    flex: 1;
+}
+
+#update-service-container {
+    background-color: var(--dark-blue);
+    color: var(--white);
+    padding: 20px;
+    width: 40rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    border-radius: 10px; /* Added border-radius for rounded corners */
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+#update-service-form .input-container {
+    margin-bottom: 20px;
+}
+
+#update-service-form label {
+    display: block;
+    margin-bottom: 5px;
+    text-align: left;
+    color: #fff; /* Adjusted label color */
+}
+
+/* Adjusted styling for select dropdowns */
+#update-service-form select,
+#update-service-form input[type="text"],
+#update-service-form input[type="number"] { /* Added styling for the number input */
+    width: 90%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--white);
+    color: var(--dark-blue);
+}
+
+#add-button {
+    background-color: var(--light-blue);
+    color: var(--white);
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#add-button:hover {
+    background-color: var(--dark-blue);
+}

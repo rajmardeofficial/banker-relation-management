@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Add Service</title>
+    <link rel="stylesheet" href="/UpdateRM/updaterelationship.css" />
+    <link rel="stylesheet" href="/Adminmain.css" />
+  </head>
+  <body>
+    <div class="wrapper">
+      <!-- Include the sidebar -->
+      <%- include('../Utils/sidebar.ejs') %>
+      <div id="Add-Relationship-Manager-Container">
+        <h1>Update Relationship Manager</h1>
+        
+        <form id="Add-Relationship-Manager-Form" method="post" action="/admin/updatemanager">
+            <label for="cars">Choose a Employee:</label>
+          <select
+            name="rmid"
+            id="cars"
+            style="border: none; outline: none; margin-bottom: 10px;"
+          >
+            <% rm.forEach(option => { %> <% const name = option.firstName + " "
+            + option.lastName %>
+            <option value="<%= option._id %>"><%= name %></option>
+            <% }); %>
+          </select>
+          <div class="form-group">
+            <label for="first_name">First Name:</label>
+            <input type="text" id="first_name" name="firstName" required />
+          </div>
+
+          <div class="form-group">
+            <label for="last_name">Last Name:</label>
+            <input type="text" id="last_name" name="lastName" required />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required />
+          </div>
+          <div class="center-button">
+            <button type="submit" id="add-button">
+              Update Relationship Manager
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="/AddService/addservice.js"></script>
+  </body>
+</html>

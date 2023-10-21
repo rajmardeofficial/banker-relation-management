@@ -1,0 +1,93 @@
+/* Import Font Dancing Script */
+@import url(https://fonts.googleapis.com/css?family=Dancing+Script);
+
+:root {
+    --white: #F6F4EB;
+    --light-blue: #9fbcda;
+    --dark-blue: #4682A9;
+    --background-color: #91C8E4;
+    --button-bg-color: #91C8E4;
+    --input-padding: 10px;
+    --border-radius: 5px;
+}
+
+body {
+    background: var(--white);
+    font-family: Arial;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+/* Main */
+.main {
+    font-size: 28px;
+    padding: 0 10px;
+    width: 58%;
+    font-size: 28px;
+}
+
+.main h2 {
+    color: var(--dark-blue);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.card-body td{
+    color: var(--white);
+}
+
+.main .card {
+    background-color: var(--dark-blue);
+    height: auto;
+    margin-bottom: 20px;
+    padding: var(--input-padding) 0 var(--input-padding) 50px;
+    width: 80%;
+}
+
+.main .card table {
+    border: none;
+    font-size: 16px;
+    height: 270px;
+    width: 80%;
+}
+
+/* Add this CSS to your Profile.css file */
+
+#change-password-button {
+    background-color: var(--white);
+    color: var(--dark-blue);
+    padding: var(--input-padding) 20px;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    margin-top: 20px; 
+}    
+
+#change-password-button:hover {
+    background-color: var(--button-bg-color);
+}
+
+#Password_Change input[type="password"] {
+    width: 40%;
+    padding: var(--input-padding);
+    margin-bottom: 10px;
+    border: 1px solid var(--light-blue);
+    border-radius: var(--border-radius);
+}
+
+#Password_Change button[type="submit"] {
+    background-color: var(--white);
+    color: var(--dark-blue);
+    padding: var(--input-padding) 20px;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+}
+
+#Password_Change button[type="submit"]:hover {
+    background-color: var(--button-bg-color);
+}

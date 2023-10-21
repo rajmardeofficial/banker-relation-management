@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Sign Up Form</title>
+    <link rel="stylesheet" href="/signup/signup.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="title">Sign Up</div>
+      <div class="content">
+        <form action="/admin/signup" method="post">
+          <div class="user-details">
+            <div class="input-box">
+              <span class="details">Name</span>
+              <input
+                name="name"
+                type="text"
+                placeholder="Enter your first name"
+                required
+              />
+            </div>
+            <div class="input-box">
+              <span class="details">Email</span>
+              <input
+                name="email"
+                type="text"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+            <div class="input-box">
+              <span class="details">Phone Number</span>
+              <input
+                name="phone"
+                type="text"
+                placeholder="Enter your number"
+                required
+              />
+            </div>
+            <div class="input-box">
+              <span class="details">Password</span>
+              <input
+                name="password"
+                type="text"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+          </div>
+          <div class="button">
+            <input type="submit" value="Register" />
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,65 @@
+body {
+    background-color: #fff;
+    font-family: Arial, sans-serif;
+}
+
+:root {
+    --white: #fff;
+    --dark-blue: #4682A9;
+    --light-blue: #749BC2;
+}
+
+.name-column {
+    flex: 1;
+}
+
+#add-service-container {
+    color: var(--white) ;
+    padding: 20px;
+    font-weight: bold;
+    width: 85%;
+    position: absolute;
+    top: 20%;
+    left: 57%;
+    transform: translate(-50%, -50%);
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: var(--dark-blue);
+}
+
+.name-list {
+    list-style-type: none;
+    padding: 0;
+    margin-top: 3rem;
+}
+
+.name-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    padding: 8px;
+    background-color: var(--light-blue);
+}
+
+.name {
+    margin-right: 10px;
+}
+
+.approve-btn,
+.reject-btn {
+    background-color: #28a745; /* Green for approve */
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    margin: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.reject-btn {
+    background-color: #dc3545; /* Red for reject */
+}

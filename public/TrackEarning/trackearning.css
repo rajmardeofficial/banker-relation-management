@@ -1,0 +1,399 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap");
+* {
+  box-sizing: border-box;
+}
+:root {
+  --white: #f6f4eb; /* New variable for white */
+  --dark-blue: #4682a9; /* New variable for dark blue */
+  --light-blue: #749bc2;
+  --filter-shadow: rgba(16, 24, 39, 0.8) 0px 6px 12px -2px,
+    rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+}
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  overflow: hidden;
+  font-family: "Poppins", sans-serif;
+  background-color: var(--white); /* Use --white here */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app-icon {
+  color: var(--dark-blue); /* Use --dark-blue here */
+}
+.app-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.app-content {
+  padding: 16px;
+  background-color: var(--white); /* Use --white here */
+  height: 100%;
+  flex: 1;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.app-content-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+}
+.app-content-headerText {
+  color: var(--dark-blue); /* Use --dark-blue here */
+  font-size: 24px;
+  line-height: 32px;
+  margin: 0;
+}
+
+.app-content-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 4px;
+}
+
+@media screen and (max-width: 520px) {
+  .app-content-actions {
+    flex-direction: column;
+  }
+  .app-content-actions .search-bar {
+    max-width: 100%;
+    order: 2;
+  }
+  .app-content-actions .app-content-actions-wrapper {
+    padding-bottom: 16px;
+    order: 1;
+  }
+}
+
+.search-bar {
+  background-color: var(--dark-blue); /* Use --dark-blue here */
+  border: 1px solid var(--dark-blue); /* Use --dark-blue here */
+  color: var(--white); /* Use --white here */
+  font-size: 14px;
+  line-height: 24px;
+  border-radius: 4px;
+  padding: 0px 10px 0px 32px;
+  height: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='feather feather-search'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+  background-size: 16px;
+  background-repeat: no-repeat;
+  background-position: left 10px center;
+  width: 100%;
+  max-width: 320px;
+  transition: 0.2s;
+}
+
+.search-bar:placeholder {
+  color: var(--white); /* Use --white here */
+}
+
+.search-bar:focus {
+  outline: none;
+  border-color: var(--dark-blue); /* Use --dark-blue here */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%232869ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='feather feather-search'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+}
+
+.tableView .products-header {
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+  background-color: var(--dark-blue); /* Use --dark-blue here */
+  position: sticky;
+  top: 0;
+}
+.tableView .products-row {
+  display: flex;
+  align-items: center;
+  border-radius: 4px;
+}
+.tableView .products-row .cell-more-button {
+  display: none;
+}
+.tableView .product-cell {
+  flex: 1;
+  padding: 8px 16px;
+  color: var(--app-content-main-color);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+@media screen and (max-width: 780px) {
+  .tableView .product-cell {
+    font-size: 12px;
+  }
+  .tableView .product-cell.image span {
+    display: none;
+  }
+  .tableView .product-cell.image {
+    flex: 0.2;
+  }
+}
+@media screen and (max-width: 520px) {
+  .tableView .product-cell.category,
+  .tableView .product-cell.sales {
+    display: none;
+  }
+  .tableView .product-cell.status-cell {
+    flex: 0.4;
+  }
+  .tableView .product-cell.stock,
+  .tableView .product-cell.price {
+    flex: 0.2;
+  }
+}
+@media screen and (max-width: 480px) {
+  .tableView .product-cell.stock {
+    display: none;
+  }
+  .tableView .product-cell.price {
+    flex: 0.4;
+  }
+}
+
+.tableView .cell-label {
+  display: none;
+}
+
+.status {
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+.status:before {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+.status.active {
+  color: #2ba972;
+  background-color: rgba(43, 169, 114, 0.2);
+}
+.status.active:before {
+  background-color: #2ba972;
+}
+.status.disabled {
+  color: #59719d;
+  background-color: rgba(89, 113, 157, 0.2);
+}
+.status.disabled:before {
+  background-color: #59719d;
+}
+
+.gridView {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -8px;
+}
+@media screen and (max-width: 520px) {
+  .gridView {
+    margin: 0;
+  }
+}
+.gridView .products-header {
+  display: none;
+}
+.gridView .products-row {
+  margin: 8px;
+  width: calc(25% - 16px);
+  background-color: var(--dark-blue); /* Use --dark-blue here */
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  position: relative;
+}
+.gridView .products-row .cell-more-button {
+  display: none;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+  position: relative;
+  background-color: var(--light-blue);
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: var(--white);
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {
+  background-color: #ddd;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown:hover .dropbtn {
+  background-color: var(--light-blue);
+}
+
+/* ... (Your existing CSS code) ... */
+
+.tableView {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+.tableView th,
+.tableView td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center; /* Center-align the text in cells */
+}
+
+.tableView th {
+  background-color: var(--dark-blue);
+  color: var(--white);
+}
+
+.tableView tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* Add this to your existing CSS or modify it according to your needs */
+.search-bar-container {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.search-bar {
+  background-color: var(--dark-blue);
+  border: 1px solid var(--dark-blue);
+  color: var(--white);
+  font-size: 14px;
+  line-height: 24px;
+  border-radius: 4px;
+  padding: 0px 10px 0px 32px;
+  height: 32px;
+  width: 100%;
+  max-width: 320px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='feather feather-search'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+  background-size: 16px;
+  background-repeat: no-repeat;
+  background-position: left 10px center;
+  transition: 0.2s;
+}
+
+.search-bar:focus {
+  outline: none;
+  border-color: var(--dark-blue);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%232869ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='feather feather-search'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+}
+
+/* Add this to your existing CSS or modify it according to your needs */
+
+/* Filter button styles */
+.dropbtn {
+  background-color: var(--light-blue);
+  color: black;
+  padding: 12px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Dropdown container styles */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown content (hidden by default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: var(--white);
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {
+  background-color: #ddd;
+}
+
+/* Show the dropdown menu on
+/* Add this to your existing CSS or modify it according to your needs */
+
+/* Status styles */
+.status.active {
+  color: #2ba972; /* Green color for Paid */
+  background-color: rgba(43, 169, 114, 0.2);
+}
+
+.status.active:before {
+  background-color: #2ba972;
+}
+
+.status.disabled {
+  color: #ff5656; /* Red color for Due */
+  background-color: rgba(255, 86, 86, 0.2);
+}
+
+.status.disabled:before {
+  background-color: #ff5656;
+}
+
+/* ... (Your existing CSS code) ... */
+
+.status-paid {
+  color: #2ba972; /* Green color for Paid */
+  background-color: rgba(43, 169, 114, 0.2);
+}
+
+.status-due {
+  color: #ff5656; /* Red color for Due */
+  background-color: rgba(255, 86, 86, 0.2);
+}

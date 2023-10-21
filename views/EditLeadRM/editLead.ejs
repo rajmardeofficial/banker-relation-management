@@ -1,0 +1,164 @@
+<!-- EditLead/editLead.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Edit Lead</title>
+    <!-- Add your CSS links or stylesheets here -->
+    <!-- <link rel="stylesheet" href="/EditLead/editLead.css"> -->
+    <style>
+        /* Add your CSS links or stylesheets here */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        #withdraw {
+            background-color: red;
+            margin-top: 10px;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Responsive styles */
+        @media only screen and (max-width: 600px) {
+            form {
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Edit Lead</h1>
+
+    <!-- Display the lead data in the form for editing -->
+    <form action="/rm/editLead/<%= result._id %>" method="POST">
+        <label for="leadId">First Name</label>
+        <input type="text" id="firstName" name="firstName" value="<%= result.firstName %>" />
+
+        <label for="generationDate">Last Name</label>
+        <input type="text" id="lastName" name="lastName" value="<%= result.lastName %>" />
+
+        <label for="generationDate">Phone</label>
+        <input type="text" id="phone" name="phone" value="<%= result.phone %>" />
+
+        <!-- Label for the status dropdown -->
+        <label for="status">Lead Status:</label>
+
+        <!-- Dropdown select element for lead status -->
+        <select id="status" name="status">
+            <option value="completed" <%=result.status==='completed' ? 'selected' : '' %>>Completed</option>
+            <option value="inProgress" <%=result.status==='inProgress' ? 'selected' : '' %>>In Progress</option>
+            <option value="cancel" <%=result.status==='cancel' ? 'selected' : '' %>>Cancel</option>
+        </select>
+
+        <label for="status">Lead Status:</label>
+
+        <!-- Dropdown select element for Payment status -->
+        <select id="Paystatus" name="paymentStatus">
+            <option value="true" <%=result.paymentStatus===true ? 'selected' : '' %>>Paid</option>
+            <option value="false" <%=result.paymentStatus===false ? 'selected' : '' %>>Due</option>
+        </select>
+
+        <!-- Add more fields based on your Lead model -->
+        <!-- Label for the service dropdown -->
+        <label for="service">Select Service:</label>
+
+        <!-- Dropdown select element for services -->
+        <select id="service_select" name="service" onchange="updateStandardFees()">
+            <% services.forEach(service=> { %>
+                <option value="<%= service.serviceName %>" data-fees="<%= service.standardFees %>" <%=result.service &&
+                    result.service.toString()===service._id.toString() ? 'selected' : '' %>>
+                    <%= service.serviceName %>
+                </option>
+                <% }); %>
+        </select>
+
+        <label for="payoutAmount">Payout Amount</label>
+        <input
+            type="text"
+            id="standard_fees"
+            name="payoutAmount"
+            value="<%= result.payoutAmount %>"
+            oninput="checkStandardFees()"
+            class="form-control"
+            required
+        />
+
+        <!-- Button to submit the edited data -->
+        <button type="submit">Edit Lead</button>
+    </form>
+
+    <!-- Add your scripts or JavaScript links here -->
+    <script>
+        function updateStandardFees() {
+            // Get the selected service option
+            const serviceSelect = document.getElementById("service_select");
+            const selectedOption =
+                serviceSelect.options[serviceSelect.selectedIndex];
+
+            // Update the standard fees input field
+            const standardFeesInput = document.getElementById("standard_fees");
+            standardFeesInput.value =
+                selectedOption.getAttribute("data-fees") || "";
+
+            // Check if the entered amount is less than standard fees
+            checkStandardFees();
+        }
+
+        function checkStandardFees() {
+            const standardFeesInput = document.getElementById("standard_fees");
+            const enteredAmount = parseFloat(standardFeesInput.value);
+            const selectedOption =
+                document.getElementById("service_select").options[
+                    document.getElementById("service_select").selectedIndex
+                ];
+            const standardFees = parseFloat(
+                selectedOption.getAttribute("data-fees")
+            );
+
+            if (enteredAmount < standardFees) {
+                alert("The amount cannot be less than the standard fees.");
+            }
+        }
+    </script>
+</body>
+
+</html>

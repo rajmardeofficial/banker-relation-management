@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Add Service</title>
+    <link rel="stylesheet" href="/AppointRM/appointrmtobanker.css" />
+    <link rel="stylesheet" href="/Adminmain.css" />
+  </head>
+  <body>
+    <div class="wrapper">
+      <!-- Include the sidebar -->
+      <%- include('../Utils/sidebar.ejs') %>
+      <div id="Add-RM-to-Banker-Container">
+        <h1>Appoint Relationship Manager To Banker</h1>
+        <form id="Add-RM-to-Banker-form" method="post" action="/admin/appointRm">
+          <label for="service">Relationship Manager:</label><br />
+          <select id="service" name="relationManager" required>
+            <!-- Add options for Relationship Manager here -->
+            <% rm.forEach((rm)=>{ %> <% const name = rm.firstName + " " +
+            rm.lastName %>
+            <option value="<%= rm._id %>"><%= name %></option>
+            <% }) %>
+            <!-- Add more options as needed --></select
+          ><br />
+
+          <label for="payment">Banker:</label><br />
+          <select id="payment" name="banker" required>
+            <!-- Add options for Banker here -->
+            <% bankers.forEach((banker)=>{ %> <% const name = banker.firstName +
+            " " + banker.lastName %>
+            <option value="<%= banker._id %>"><%= name %></option>
+            <% }) %>
+            <!-- Add more options as needed --></select
+          ><br />
+
+          <button type="submit" id="add-button">Submit</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="/AddService/addservice.js"></script>
+  </body>
+</html>

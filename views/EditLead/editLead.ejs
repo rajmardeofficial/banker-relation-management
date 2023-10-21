@@ -1,0 +1,133 @@
+<!-- EditLead/editLead.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Add your CSS links or stylesheets here -->
+    <!-- Bootstrap CSS Link (Example) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    
+    <meta charset="UTF-8" />
+    <title>Edit Lead</title>
+    <!-- Add your custom styles here -->
+    <style>
+        /* Your custom styles go here */
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Edit Lead</h1>
+        <!-- Bootstrap form starts here -->
+        <form action="/<%= user %>/editLead/<%= result._id %>/<%= selectedService._id %>" method="POST" id="editForm">
+            <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input type="text" class="form-control" id="firstName" name="firstName" value="<%= result.firstName %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input type="text" class="form-control" id="lastName" name="lastName" value="<%= result.lastName %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="text" class="form-control" id="phone" name="phone" value="<%= result.phone %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="service">Select Service:</label>
+                <select class="form-control" id="service" name="service" onchange="updateAmount()">
+                    <% services.forEach(s => { %>
+                        <option value="<%= s.serviceName %>" data-fees="<%= s.standardFees %>" <%= selectedService.serviceName === s.serviceName ? 'selected' : '' %>>
+                            <%= s.serviceName %>
+                        </option>
+                    <% }); %>
+                </select>
+            </div>
+
+            <p style="color: red;">Note: The amount cannot be less than Standard Fees</p>
+
+            <div class="form-group">
+                <label for="amount">Amount</label>
+                <input type="text" class="form-control" id="amount" name="amount" value="<%= selectedService.amount %>" required>
+            </div>
+
+            <% if(user==="rm"){ %>
+                <div class="form-group">
+                    <label for="status">Select Status</label>
+                    <select class="form-control" id="status" name="status">
+                        <option value="completed" <%= selectedService.status === 'completed' ? 'selected' : '' %>>Completed</option>
+                        <option value="cancel" <%= selectedService.status === 'cancel' ? 'selected' : '' %>>Cancel</option>
+                        <option value="inprogress" <%= selectedService.status === 'inprogress' ? 'selected' : '' %>>In Progress</option>
+                    </select>
+                </div>
+            <% } %>
+
+            <div class="form-group">
+                <label for="amount">Remark</label>
+                <input type="text" class="form-control" id="amount" name="remark" value="<%= selectedService.remark %>" required>
+            </div>
+            
+            <% if(user==="rm" &&  result.createdby !== "rm"){ %>
+                <div class="form-group">
+                    <button class="btn btn-danger"><a style="text-decoration: none; color: white;" href="/rm/withdrawLead/<%= result._id %>">Withdraw Lead</a></button>
+                </div>
+            <% } %>
+
+            <!-- Other form fields for services go here -->
+
+            <button type="submit" class="btn btn-primary">Edit Lead</button>
+        </form>
+        <!-- Bootstrap form ends here -->
+    </div>
+
+    <!-- Bootstrap JS and Popper.js (Example) -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <!-- Add your custom styles here -->
+<script>
+    function updateAmount() {
+        const serviceSelect = document.getElementById("service");
+        const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+        const amountInput = document.getElementById("amount");
+
+        // Get the standard fees from the selected option
+        const standardFees = parseFloat(selectedOption.getAttribute("data-fees"));
+
+        // Set the amount in the input field
+        amountInput.value = standardFees || "";
+    }
+
+    function validateAndSubmit() {
+        const amountInput = document.getElementById("amount");
+        const enteredAmount = parseFloat(amountInput.value);
+
+        const serviceSelect = document.getElementById("service");
+        const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+        const standardFees = parseFloat(selectedOption.getAttribute("data-fees"));
+
+        // Check if the entered amount is less than standard fees
+        if (enteredAmount < standardFees) {
+            alert("Amount cannot be less than standard fees. Please correct the amount.");
+            // Prevent form submission
+            return false;
+        }
+
+        // Allow form submission
+        return true;
+    }
+
+    // Attach the updateAmount function to the service select's onchange event
+    document.getElementById("service").onchange = updateAmount;
+
+    // Attach the validateAndSubmit function to the form's onsubmit event
+    document.getElementById("editForm").onsubmit = validateAndSubmit;
+</script>
+
+</body>
+
+</html>

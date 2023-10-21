@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/list/list.css" />
+    <title>Dashboard</title>
+  </head>
+  <body>
+    <div class="dashboard">
+      <div class="header">
+        <h1>RM to Banker List</h1>
+      </div>
+
+      <div class="content">
+        <div class="bankers">
+          <h2>Bankers</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Banker Name</th>
+                <th>Banker Email</th>
+                <th>Banker Phone</th>
+                <th>RM</th>
+                <th>RM Email</th>
+                <th>RM Phone</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% bankers.forEach(banker => { %>
+              <tr>
+                <td><%= banker.firstName %> <%= banker.lastName %></td>
+                <td><%= banker.email %></td>
+                <td><%= banker.phone %></td>
+                <td>
+                  <%= banker.rm ? `${banker.rm.firstName} ${banker.rm.lastName}`
+                  : 'N/A' %>
+                </td>
+                <td><%= banker.rm ? banker.rm.email : 'N/A' %></td>
+                <td><%= banker.rm ? banker.rm.phone : 'N/A' %></td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Update Service</title>
+    <link rel="stylesheet" href="/UpdateService/updateservice.css" />
+    <link rel="stylesheet" href="/Adminmain.css" />
+  </head>
+  <body>
+    <div class="wrapper">
+      <!-- Include the sidebar -->
+      <%- include('../Utils/sidebar.ejs') %>
+      <div id="update-service-container">
+        <h1>Update Services</h1>
+        <form id="update-service-form" method="post" action="/admin/updateservice">
+          <label for="service">Service:</label><br />
+          <select id="service" name="serviceId" onchange="updateServiceInfo()" required>
+            <!-- Add options for services here -->
+            <% services.forEach((service) => { %>
+              <option
+                value="<%= service._id %>"
+                data-fees="<%= service.standardFees %>"
+              >
+                <%= service.serviceName %>
+              </option>
+            <% }) %>
+            <!-- Add more options as needed -->
+          </select><br />
+
+          <div class="input-container">
+            <label for="textInput">Service Name:</label>
+            <input type="text" id="textInput" name="updatedServiceName" required />
+          </div>
+
+          <div class="input-container">
+            <label for="standardFees">Standard Fees:</label>
+            <input type="number" id="standardFees" name="standardFees" required />
+          </div>
+
+          <button type="submit" id="add-button">Update Service</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      function updateServiceInfo() {
+        var selectedService = document.getElementById('service');
+        var serviceNameInput = document.getElementById('textInput');
+        var standardFeesInput = document.getElementById('standardFees');
+
+        var selectedOption = selectedService.options[selectedService.selectedIndex];
+
+        // Set the service name and standard fees
+        serviceNameInput.value = selectedOption.text;
+        standardFeesInput.value = selectedOption.getAttribute('data-fees') || '';
+      }
+    </script>
+  </body>
+</html>

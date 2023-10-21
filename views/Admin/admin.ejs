@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/Admin/admin.css" />
+  <!-- Make sure to link your CSS file here -->
+  <link rel="stylesheet" href="/adminMain.css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Include jQuery -->
+  <title>Admin Portal</title>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- Include the sidebar -->
+    <%- include('../Utils/sidebar.ejs') %>
+
+    <div class="main_content">
+      <div class="info" id="content">
+        <div class="app-container">
+          <div class="app-content">
+            <div class="app-content-header">
+              <h1 class="app-content-headerText">TrackLead</h1>
+              <div class="button-container">
+                <a href="/admin/download">
+                  <button style="cursor: pointer" class="app-content-headerButton">
+                    Download CSV
+                  </button>
+                </a>
+                <div class="dropdown">
+                  <button class="dropbtn">filter</button>
+                  <div class="dropdown-content">
+                    <a href="#" data-value="all">All</a>
+                    <a href="#" data-value="Completed">Completed</a>
+                    <a href="#" data-value="Cancel">Cancel</a>
+                    <a href="#" data-value="Pending">Pending</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="app-content-actions"></div>
+            <div class="products-area-wrapper tableView">
+              <div class="products-header">
+                <div class="product-cell Id">Lead ID</div>
+                <div class="product-cell Date">Lead Generation Date</div>
+                <div class="product-cell Status">Lead Status</div>
+                <div class="product-cell Remarks">Mobile</div>
+                <div class="product-cell Remarks">Remarks</div>
+                <div class="product-cell Service">Service</div>
+                <div class="product-cell Name">Customer Name</div>
+              </div>
+              <!-- Product rows will be generated here by JavaScript -->
+              <% leads.forEach(function (lead) { %>
+                <div class="products-row">
+                  <!-- Render data from the 'dummyData' array -->
+                  <div class="product-cell image">
+                    <span><%= lead.leadId %></span>
+                  </div>
+                  <div class="product-cell category">
+                    <% const date = new Date(lead.generationDate); %> <% const formattedDate = date.toDateString(); %>
+                    <span><%= formattedDate %></span>
+                  </div>
+                  <div class="product-cell status-cell">
+                    <span class="cell-label">Status:</span>
+                    <span class="status <%= lead.paymentStatus ? 'completed' : 'pending' %>">
+                      <%= lead.paymentStatus ? 'Completed' : 'Pending' %>
+                    </span>
+                  </div>
+                  <div class="product-cell sales">
+                    <span class="cell-label">Mobile:</span><%= lead.phone %>
+                  </div>
+                  <div class="product-cell sales">
+                    <span class="cell-label">Remarks:</span>
+                    <% if (lead.services.length > 0) { %>
+                      <%= lead.services[0].remark %>
+                    <% } %>
+                  </div>
+                  <div class="product-cell stock">
+                    <span class="cell-label">Service:</span>
+                    <% if (lead.services.length > 0) { %>
+                      <%= lead.services[0].serviceName %>
+                    <% } %>
+                  </div>
+                  <div class="product-cell price">
+                    <% const name = lead.firstName + " " + lead.lastName %>
+                    <span class="cell-label">Name:</span><%= name %>
+                  </div>
+                  <!-- ... -->
+                </div>
+              <% }); %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="/Admin/admin.js"></script>
+</body>
+</html>

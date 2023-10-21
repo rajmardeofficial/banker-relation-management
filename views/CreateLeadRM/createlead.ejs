@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customer Service Form</title>
+    <!-- Add Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="container mt-5">
+      <div class="row">
+        <div class="col-md-8 mx-auto">
+          <h1 class="text-center mb-4">Customer Service Form</h1>
+          <form action="/rm/createLead" method="post">
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input
+                type="text"
+                id="firstName"
+                name="firstName"
+                class="form-control"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input
+                type="text"
+                id="lastName"
+                name="lastName"
+                class="form-control"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="phone">Mobile Number:</label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                class="form-control"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="service_select">Select a Service:</label>
+              <select
+                name="service"
+                id="service_select"
+                onchange="updateStandardFees()"
+                class="form-control"
+                required
+              >
+                <option value="">Select a Service</option>
+                <% result.forEach((result) => { %>
+                <option
+                  value="<%= result.serviceName %>"
+                  data-fees="<%= result.standardFees %>"
+                >
+                  <%= result.serviceName %>
+                </option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="service_select">Select a Banker:</label>
+              <select
+                name="banker"
+                id="service_select"
+                onchange="updateStandardFees()"
+                class="form-control"
+                required
+              >
+                <option value="">Select a Banker</option>
+                <% banker.forEach((banker) => { %>
+                <option value="<%= banker._id %>">
+                  <% const name = banker.firstName + " " + banker.lastName %>
+                  <%= name %>
+                </option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="type_of_services">Type of Services:</label>
+              <input
+                type="text"
+                id="type_of_services"
+                name="type_of_services"
+                readonly
+                class="form-control"
+              />
+            </div>
+            <p class="text-danger">
+              Please note that the amount cannot be less than the standard
+              amount.
+            </p>
+            <div class="form-group">
+              <label for="standard_fees">Standard Fees:</label>
+              <input
+                type="text"
+                id="standard_fees"
+                name="payoutAmount"
+                value=""
+                oninput="checkStandardFees()"
+                class="form-control"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="remark">Remarks:</label>
+              <textarea
+                id="remark"
+                name="remark"
+                class="form-control"
+                required
+              ></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Bootstrap JS and Popper.js -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script src="/CreateLead/createlead.js"></script>
+    <script>
+      function updateStandardFees() {
+        // Get the selected service option
+        const serviceSelect = document.getElementById("service_select");
+        const selectedOption =
+          serviceSelect.options[serviceSelect.selectedIndex];
+
+        // Update the type of services input field
+        const typeOfServicesInput = document.getElementById("type_of_services");
+        typeOfServicesInput.value = selectedOption.value;
+
+        // Update the standard fees input field
+        const standardFeesInput = document.getElementById("standard_fees");
+        standardFeesInput.value =
+          selectedOption.getAttribute("data-fees") || "";
+
+        // Check if the entered amount is less than standard fees
+        checkStandardFees();
+      }
+
+      function checkStandardFees() {
+        const standardFeesInput = document.getElementById("standard_fees");
+        const enteredAmount = parseFloat(standardFeesInput.value);
+        const selectedOption =
+          document.getElementById("service_select").options[
+            document.getElementById("service_select").selectedIndex
+          ];
+        const standardFees = parseFloat(
+          selectedOption.getAttribute("data-fees")
+        );
+
+        if (enteredAmount < standardFees) {
+          alert("The amount cannot be less than the standard fees.");
+        }
+      }
+    </script>
+  </body>
+</html>

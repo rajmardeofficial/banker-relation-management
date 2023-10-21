@@ -1,0 +1,77 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+
+/* Define color variables */
+:root {
+  --white: #F6F4EB;
+  --light-blue: #9fbcda;
+  --dark-blue: #4682A9;
+}
+
+/* Reset default styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', Arial, Helvetica, sans-serif;
+  color: rgb(5, 87, 134);
+}
+
+#form-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  border: 2px solid var(--dark-blue);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Body styles */
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  background: var(--white);
+}
+
+.form-details {
+  padding: 20px;
+  background-color: var(--light-blue);
+}
+
+.input-css {
+  border-radius: 2px;
+  border: var(--light-blue);
+  width: 100%;
+}
+
+/* CSS for the Create button */
+#create_button {
+  padding: 5px 20px;;
+  color: #000;
+  border: none;
+  margin: 5% 0;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+#create_button:hover {
+  background-color: #2980b9;
+}
+
+/* Responsive styles for smaller screens */
+@media (max-width: 584px) {
+  #form-container {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 459px) {
+  .form-details {
+    padding: 10px;
+  }
+}

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Approve Admin Request</title>
+  <link rel="stylesheet" href="/ApproveAdminReq/approveadminrequest.css">
+  <link rel="stylesheet" href="/Adminmain.css">
+</head>
+<body>
+
+    <div class="wrapper">
+        <!-- Include the sidebar -->
+      <%- include('../Utils/sidebar.ejs') %>
+        <div id="add-service-container">
+            <h1>Approve Admin Request</h1>
+            <ul class="name-list" id="nameList">
+                <% admins.forEach(admin => { %>
+                    <li class="name-item">
+                        <div class="name-column">
+                            <span class="name"><%= admin.name %></span>
+                        </div>
+                        <div class="button-column">
+                            <button class="approve-btn" onclick="handleAction('<%= admin._id %>', 'approve')">Approve</button>
+                            <button class="reject-btn" onclick="handleAction('<%= admin._id %>', 'reject')">Reject</button>
+                        </div>
+                    </li>
+                <% }) %>
+            </ul>
+        </div>
+    </div>     
+
+  <script src="/ApproveAdminReq/approveadminrequest.js"></script>
+</body>
+</html>

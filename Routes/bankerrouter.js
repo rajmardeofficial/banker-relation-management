@@ -56,7 +56,7 @@ router.post("/signup", async (req, res) => {
 
     await banker.save();
 
-    res.redirect("/banker/dashboard");
+    res.redirect("/banker/login");
   } catch (error) {
     console.error("Error during signup:", error);
     res.status(500).json({ message: "Internal server error" });

@@ -381,7 +381,7 @@ router.get("/editLead/:id/:serviceId", async (req, res) => {
 //Login GET
 
 router.get("/login", (req, res) => {
-  res.render("loginRM/login");
+  res.render("loginRM/Login");
 });
 
 //Dashboard Get

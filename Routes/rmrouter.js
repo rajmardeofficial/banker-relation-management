@@ -14,7 +14,7 @@ const mongoose = require("mongoose");
 function rmCheck(req, res, next) {
   RM.findById(req.rm.id)
     .then((result) => {
-      console.log(result);
+      // console.log(result);
       if (result) {
         next();
       } else {
@@ -100,6 +100,13 @@ router.post("/createLead", authenticateToken, async (req, res) => {
     // Extract data from the request body
     const { firstName, lastName, phone, services, bankersId } = req.body;
 
+    console.log(req.body);
+
+    // Check if the 'services' array is present
+    if (!services || !Array.isArray(services)) {
+      return res.status(400).json({ error: "Services array is required" });
+    }
+
     // Fetch standard fees for each service from the database
     const serviceData = await Service.find({
       serviceName: { $in: services.map((service) => service.serviceName) },
@@ -153,7 +160,7 @@ router.post("/createLead", authenticateToken, async (req, res) => {
       phone,
       services: updatedServices,
       payoutAmount,
-      createdby: "banker",
+      createdby: "rm",
       // Add other lead properties as needed
     });
 
@@ -161,10 +168,10 @@ router.post("/createLead", authenticateToken, async (req, res) => {
     await lead.save();
 
     // Find the associated Banker by their ID
-    const bankerId = req.banker.id;
+    const bankerId = bankersId;
     const banker = await Banker.findById(bankerId);
-   
-    
+
+
 
     if (!banker) {
       return res.status(404).json({ error: "Banker not found" });
@@ -197,15 +204,14 @@ router.post("/editLead/:id/:serviceId", async (req, res) => {
 
     // Get the standard fees from the Service collection
     const serviceFromDb = await Service.findOne({ serviceName: service });
-    console.log("Service fetched details: " + serviceFromDb);
 
     // Calculate extra amount and payout amount
     const extraAmount = amount - serviceFromDb.standardFees;
     const payoutAmount = serviceFromDb.standardFees * 0.4 + extraAmount * 0.6;
-    console.log("extraAmount: " + extraAmount);
-    console.log("40 per of standard fees: " + serviceFromDb.standardFees * 0.4);
-    console.log("60 per of extra amount: " + extraAmount * 0.6);
-    console.log("payoutAmount: " + payoutAmount);
+    // console.log("extraAmount: " + extraAmount);
+    // console.log("40 per of standard fees: " + serviceFromDb.standardFees * 0.4);
+    // console.log("60 per of extra amount: " + extraAmount * 0.6);
+    // console.log("payoutAmount: " + payoutAmount);
 
     // Update the entire Lead document
     const result = await Lead.findByIdAndUpdate(
@@ -355,7 +361,7 @@ router.get("/editLead/:id/:serviceId", async (req, res) => {
       (service) => service._id.toString() === serviceId
     );
 
-    console.log(selectedService);
+    // console.log(selectedService);
 
     if (!selectedService) {
       return res.status(404).send("Service not found for the specified lead");

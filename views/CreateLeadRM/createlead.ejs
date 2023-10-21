@@ -3,19 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Customer Service Form</title>
+    <title>Create Lead Form</title>
     <!-- Add Bootstrap CSS -->
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     />
+
+    <style>
+      .delete-service {
+        color: red;
+        cursor: pointer;
+      }
+    </style>
   </head>
   <body>
     <div class="container mt-5">
       <div class="row">
         <div class="col-md-8 mx-auto">
-          <h1 class="text-center mb-4">Customer Service Form</h1>
-          <form action="/rm/createLead" method="post">
+          <h1 class="text-center mb-4">Service Form</h1>
+
+          <form id="leadForm">
+            <!-- First Name -->
             <div class="form-group">
               <label for="firstName">First Name</label>
               <input
@@ -26,6 +35,8 @@
                 required
               />
             </div>
+
+            <!-- Last Name -->
             <div class="form-group">
               <label for="lastName">Last Name</label>
               <input
@@ -36,8 +47,10 @@
                 required
               />
             </div>
+
+            <!-- Mobile Number -->
             <div class="form-group">
-              <label for="phone">Mobile Number:</label>
+              <label for="phone">Mobile Number</label>
               <input
                 type="tel"
                 id="phone"
@@ -46,33 +59,35 @@
                 required
               />
             </div>
+
+            <!-- Select Services from Dropdown -->
             <div class="form-group">
-              <label for="service_select">Select a Service:</label>
+              <label for="serviceSelect">Select Services</label>
               <select
-                name="service"
-                id="service_select"
-                onchange="updateStandardFees()"
+                name="services"
+                id="serviceSelect"
                 class="form-control"
                 required
               >
-                <option value="">Select a Service</option>
-                <% result.forEach((result) => { %>
+                <option value="">Select Services</option>
+                <% result.forEach((service) => { %>
                 <option
-                  value="<%= result.serviceName %>"
-                  data-fees="<%= result.standardFees %>"
+                  value="<%= service.serviceName %>"
+                  data-standardfees="<%= service.standardFees %>"
                 >
-                  <%= result.serviceName %>
+                  <%= service.serviceName %>
                 </option>
                 <% }) %>
+                <!-- Add more options as needed -->
               </select>
             </div>
+
             <div class="form-group">
               <label for="service_select">Select a Banker:</label>
               <select
-                name="banker"
-                id="service_select"
-                onchange="updateStandardFees()"
+                name="bankersId"
                 class="form-control"
+                id="banker"
                 required
               >
                 <option value="">Select a Banker</option>
@@ -84,42 +99,49 @@
                 <% }) %>
               </select>
             </div>
+
+            <!-- Standard Fees -->
             <div class="form-group">
-              <label for="type_of_services">Type of Services:</label>
+              <label for="standardFees">Standard Fees</label>
               <input
-                type="text"
-                id="type_of_services"
-                name="type_of_services"
-                readonly
-                class="form-control"
-              />
-            </div>
-            <p class="text-danger">
-              Please note that the amount cannot be less than the standard
-              amount.
-            </p>
-            <div class="form-group">
-              <label for="standard_fees">Standard Fees:</label>
-              <input
-                type="text"
-                id="standard_fees"
-                name="payoutAmount"
-                value=""
-                oninput="checkStandardFees()"
+                type="number"
+                id="standardFees"
+                name="standardFees"
                 class="form-control"
                 required
+                value="<%= result.length ? result[0].standardFees : '' %>"
               />
             </div>
+
+            <!-- Remarks -->
             <div class="form-group">
-              <label for="remark">Remarks:</label>
+              <label for="remarks">Remarks</label>
               <textarea
-                id="remark"
-                name="remark"
+                id="remarks"
+                name="remarks"
                 class="form-control"
-                required
+                rows="3"
               ></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+
+            <!-- Add Service Button -->
+            <button type="button" class="btn btn-primary" id="addServiceButton">
+              Add Service
+            </button>
+
+            <!-- Selected Services Section -->
+            <div id="selectedServicesSection" class="mt-4">
+              <p>Selected Services:</p>
+              <div id="selectedServices"></div>
+              <p style="color: rgb(22, 179, 22)">
+                Total Standard Fees: ₹<span id="totalStandardFees">0.00</span>
+              </p>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary" id="submitFormButton">
+              Submit
+            </button>
           </form>
         </div>
       </div>
@@ -129,43 +151,156 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-    <script src="/CreateLead/createlead.js"></script>
     <script>
-      function updateStandardFees() {
-        // Get the selected service option
-        const serviceSelect = document.getElementById("service_select");
-        const selectedOption =
-          serviceSelect.options[serviceSelect.selectedIndex];
+        // Add an event listener to the serviceSelect dropdown
+        document
+          .getElementById("serviceSelect")
+          .addEventListener("change", function () {
+            // Get the selected option
+            const selectedOption = this.options[this.selectedIndex];
 
-        // Update the type of services input field
-        const typeOfServicesInput = document.getElementById("type_of_services");
-        typeOfServicesInput.value = selectedOption.value;
+            // Update the value of the standardFees input
+            document.getElementById("standardFees").value =
+              selectedOption.getAttribute("data-standardfees");
+          });
 
-        // Update the standard fees input field
-        const standardFeesInput = document.getElementById("standard_fees");
-        standardFeesInput.value =
-          selectedOption.getAttribute("data-fees") || "";
+        // Add an event listener to the standardFees input for editing
+        document
+          .getElementById("standardFees")
+          .addEventListener("input", function () {
+            // Get the entered amount
+            const enteredAmount = parseFloat(this.value);
 
-        // Check if the entered amount is less than standard fees
-        checkStandardFees();
-      }
+            // Get the standard fees from the selected option
+            const selectedOption =
+              document.getElementById("serviceSelect").options[
+                document.getElementById("serviceSelect").selectedIndex
+              ];
+            const standardFees = parseFloat(
+              selectedOption.getAttribute("data-standardfees")
+            );
 
-      function checkStandardFees() {
-        const standardFeesInput = document.getElementById("standard_fees");
-        const enteredAmount = parseFloat(standardFeesInput.value);
-        const selectedOption =
-          document.getElementById("service_select").options[
-            document.getElementById("service_select").selectedIndex
-          ];
-        const standardFees = parseFloat(
-          selectedOption.getAttribute("data-fees")
-        );
+            // Check if the entered amount is less than standard fees
+            if (enteredAmount < standardFees) {
+              // Show alert only once
+              if (!window.alertShown) {
+                alert("Amount cannot be less than the standard amount");
+                window.alertShown = true;
+              }
+            } else {
+              // Reset the alert flag if the entered amount is valid
+              window.alertShown = false;
+            }
+          });
 
-        if (enteredAmount < standardFees) {
-          alert("The amount cannot be less than the standard fees.");
+        // Global array to store selected services and their amounts
+        const selectedServices = [];
+
+        // Add an event listener to the "Add Service" button
+        document
+          .getElementById("addServiceButton")
+          .addEventListener("click", function () {
+            // Get the selected option
+            const selectedOption =
+              document.getElementById("serviceSelect").options[
+                document.getElementById("serviceSelect").selectedIndex
+              ];
+
+            // Get the service name, amount, and remark
+            const serviceName = selectedOption.value;
+            const amount = parseFloat(
+              document.getElementById("standardFees").value
+            );
+            const remark = document.getElementById("remarks").value;
+
+            // Add the service to the selectedServices array
+            selectedServices.push({ serviceName, amount, remark });
+
+            // Display the selected services
+            updateSelectedServicesDisplay();
+            updateTotalStandardFees();
+          });
+
+        // Function to update the display of selected services
+        function updateSelectedServicesDisplay() {
+          const selectedServicesContainer =
+            document.getElementById("selectedServices");
+
+          // Clear the container
+          selectedServicesContainer.innerHTML = "";
+
+          // Display each selected service
+          selectedServices.forEach((service, index) => {
+            const serviceDiv = document.createElement("div");
+            serviceDiv.className = "selected-service";
+            serviceDiv.innerHTML = `
+        <span>${service.serviceName} - ${service.amount.toFixed(2)}</span>
+        <span class="delete-service" onclick="deleteService(${index})">Delete</span>
+      `;
+            selectedServicesContainer.appendChild(serviceDiv);
+          });
         }
-      }
+
+        // Function to update the total standard fees
+        function updateTotalStandardFees() {
+          const totalStandardFees = selectedServices.reduce(
+            (total, service) => total + service.amount,
+            0
+          );
+          document.getElementById("totalStandardFees").textContent =
+            totalStandardFees.toFixed(2);
+        }
+
+        // Function to delete a selected service
+        function deleteService(index) {
+          // Remove the selected service from the array
+          selectedServices.splice(index, 1);
+
+          // Update the display
+          updateSelectedServicesDisplay();
+          updateTotalStandardFees();
+        }
+
+        // Add an event listener to the submit button
+        document
+          .getElementById("leadForm")
+          .addEventListener("submit", async function (event) {
+            // Prevent the default form submission behavior
+            event.preventDefault();
+
+            // Create an object from the form data
+            const formData = {
+              firstName: document.getElementById("firstName").value,
+              lastName: document.getElementById("lastName").value,
+              phone: document.getElementById("phone").value,
+              bankersId: document.getElementById('banker').value,
+              services: selectedServices.map((service) => ({
+                serviceName: service.serviceName,
+                amount: service.amount,
+                remark: service.remark,
+              })),
+              // Add other form fields as needed
+            };
+
+            try {
+              // Use Axios to submit the form data to the POST endpoint
+              const response = await axios.post("/rm/createLead", formData);
+
+              // Axios automatically handles status codes, so you can check if the response is successful
+              if (response.status === 200) {
+                // Success!
+                location.replace("/rm/dashboard");
+              } else {
+                // Handle other status codes if needed
+                throw new Error(`HTTP error! Status: ${response.status}`);
+              }
+            } catch (error) {
+              console.error("Error:", error);
+              alert("Error creating lead. Please try again.");
+            }
+          });
     </script>
   </body>
 </html>

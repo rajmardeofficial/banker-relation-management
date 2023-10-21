@@ -272,7 +272,7 @@ router.post("/appointRm", authenticateToken, adminCheck, (req, res) => {
 
 //Get Request for Login
 router.get("/login", (req, res) => {
-  res.render("AdminLogin/login");
+  res.render("AdminLogin/Login");
 });
 
 // Get request for admin dashboard page

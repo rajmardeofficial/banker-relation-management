@@ -270,7 +270,8 @@ router.get("/withdrawLead/:id", (req, res) => {
 
 router.get("/createLead", authenticateToken, rmCheck, (req, res) => {
   try {
-    Banker.find().then((banker) => {
+    Banker.find({ rm: req.rm.id }).then((banker) => {
+      console.log(banker);
       Service.find().then((result, err) => {
         if (!err) {
           res.render("CreateLeadRM/createlead", { result, banker });

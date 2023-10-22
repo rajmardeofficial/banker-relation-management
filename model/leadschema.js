@@ -69,6 +69,10 @@ const leadSchema = new Schema({
         required: true,
         default: "Pending",
       },
+      paymentStatus: {
+        type: Boolean,
+        default: false,
+      },
     },
   ],
   phone: {
@@ -84,10 +88,7 @@ const leadSchema = new Schema({
     type: Number,
     default: 0,
   },
-  paymentStatus: {
-    type: Boolean,
-    default: false,
-  },
+
   isActive: {
     type: Boolean,
     default: true,

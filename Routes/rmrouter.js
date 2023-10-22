@@ -98,7 +98,7 @@ router.post("/login", (req, res) => {
 router.post("/createLead", authenticateToken, async (req, res) => {
   try {
     // Extract data from the request body
-    const { firstName, lastName, phone, services, bankersId } = req.body;
+    const { firstName, lastName, phone, services, bankersId, paymentStatus } = req.body;
 
     console.log(req.body);
 
@@ -197,7 +197,7 @@ router.post("/createLead", authenticateToken, async (req, res) => {
 
 router.post("/editLead/:id/:serviceId", async (req, res) => {
   try {
-    const { firstName, lastName, phone, service, amount, remark, status } =
+    const { firstName, lastName, phone, service, amount, remark, status, paymentStatus } =
       req.body;
     const leadId = req.params.id;
     const serviceIdToUpdate = req.params.serviceId;
@@ -227,6 +227,7 @@ router.post("/editLead/:id/:serviceId", async (req, res) => {
           "services.$[elem].remark": remark, // You may need to adjust this part based on your requirements
           "services.$[elem].payout": payoutAmount, // You may need to adjust this part based on your requirements
           "services.$[elem].status": status, // You may need to adjust this part based on your requirements
+          "services.$[elem].paymentStatus": paymentStatus, // You may need to adjust this part based on your requirements
         },
       },
       {

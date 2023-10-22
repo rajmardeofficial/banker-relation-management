@@ -90,7 +90,7 @@
                       <td><%= formattedDate %></td>
                       <td>
                         <span class="cell-label">Status:</span>
-                        <% const status = lead?.paymentStatus ? "Paid" : "Due"; %>
+                        <% const status = service?.paymentStatus ? "Paid" : "Due"; %>
                         <span class="status <%= status.toLowerCase() === 'paid' ? 'status-paid' : 'status-due' %>">
                           <%= status.toUpperCase() %>
                         </span>

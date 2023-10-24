@@ -289,10 +289,10 @@ router.get("/createLead", authenticateToken, rmCheck, (req, res) => {
 
 router.get("/trackLead", authenticateToken, rmCheck, async (req, res) => {
   try {
-    const objectId = new mongoose.Types.ObjectId(req.rm.id);
+    const rmObjectId = new mongoose.Types.ObjectId(req.rm.id);
 
     const result = await RM.aggregate([
-      { $match: { _id: objectId } },
+      { $match: { _id: rmObjectId } },
       {
         $lookup: {
           from: "bankers",
@@ -316,7 +316,6 @@ router.get("/trackLead", authenticateToken, rmCheck, async (req, res) => {
         $group: {
           _id: "$_id",
           rm: { $first: "$$ROOT" },
-          bankers: { $push: "$bankers" },
           leads: { $push: "$leads" },
         },
       },
@@ -327,17 +326,13 @@ router.get("/trackLead", authenticateToken, rmCheck, async (req, res) => {
       return res.status(404).send("RM not found");
     }
 
-    // const rmWithBankersAndLeads = result[0];
-    // console.log("RM:", rmWithBankersAndLeads.rm);
-    // console.log("Bankers:", rmWithBankersAndLeads.bankers);
-    // console.log("Leads:", rmWithBankersAndLeads.leads);
+    // Extract the leads array from the result
+    const leads = result[0].leads.reduce((acc, lead) => acc.concat(lead), []);
 
     res.render("TrackLeadRM/tracklead", {
-      leads: result[0].leads[0],
+      leads,
       user: "banker",
     });
-
-    // res.status(200).json({ result });
   } catch (error) {
     console.error("Error fetching data:", error);
     res.status(500).send("Internal Server Error");

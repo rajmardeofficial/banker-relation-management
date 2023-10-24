@@ -19,7 +19,8 @@ exports.login = (user, modelName, req, res, redirectURL) => {
               );
               res.cookie("jwt", accessToken, {
                 httpOnly: true,
-                secure: true, // Set to true for HTTPS
+                // secure: true, // Set to true for HTTPS
+                domain: "15.206.168.187",
               });
               res.redirect(redirectURL);
             } else {

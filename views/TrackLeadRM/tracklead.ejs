@@ -52,7 +52,6 @@
           />
         </div>
 
-
         <!-- Table starts here -->
         <table class="tableView">
           <thead>
@@ -74,8 +73,9 @@
               Please <a href="/banker/createLead">create Lead</a> to display
               them
             </p>
-            <% } else { %> <% leads.forEach(function (lead) { %> <% if (lead &&
-            lead.isActive) { %> <% lead.services.forEach(function (service) { %>
+            <% } else { %> <% leads.forEach(function (lead) { %> <% if (lead) {
+            %> <% lead.services.forEach(function (service) { %> <%
+            if(service.isActive){ %>
             <tr>
               <td><%= lead.leadId %></td>
               <% const date = new Date(lead.generationDate); %> <% const
@@ -107,7 +107,7 @@
                 >
               </td>
             </tr>
-            <% }); %> <% } %> <% }); %> <% } %>
+            <% } %> <% }); %> <% } %> <% }); %> <% } %>
           </tbody>
         </table>
         <!-- Table ends here -->

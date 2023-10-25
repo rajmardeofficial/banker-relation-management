@@ -73,6 +73,10 @@ const leadSchema = new Schema({
         type: Boolean,
         default: false,
       },
+      isActive: {
+        type: Boolean,
+        default: true,
+      }
     },
   ],
   phone: {
@@ -89,10 +93,7 @@ const leadSchema = new Schema({
     default: 0,
   },
 
-  isActive: {
-    type: Boolean,
-    default: true,
-  },
+
   leadId: {
     type: String,
     default: null,

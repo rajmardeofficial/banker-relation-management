@@ -255,16 +255,37 @@ router.post("/editLead/:id/:serviceId", async (req, res) => {
 
 // withdraw lead
 
-router.get("/withdrawLead/:id", (req, res) => {
-  const id = req.params.id;
-  Lead.findByIdAndUpdate(id, { isActive: false }).then((results, err) => {
-    if (!err) {
-      res.send("Lead has been withdrawed");
-    } else {
-      res.send(err + ": PLEASE CONTACT DEVELOPER FOR THIS ISSUE");
+router.get("/withdrawLead/:id/:serviceId", async (req, res) => {
+  const leadId = req.params.id;
+  const serviceId = req.params.serviceId;
+
+  try {
+    const lead = await Lead.findById(leadId);
+
+    if (!lead) {
+      return res.status(404).send("Lead not found");
     }
-  });
+
+    // Find the service by ID in the lead's services array
+    const serviceToUpdate = lead.services.find(service => service._id.toString() === serviceId);
+
+    if (!serviceToUpdate) {
+      return res.status(404).send("Service not found");
+    }
+
+    // Update the isActive property for the specific service
+    serviceToUpdate.isActive = false;
+
+    // Save the updated lead document
+    await lead.save();
+
+    res.send("Lead has been withdrawn for the specific service");
+  } catch (error) {
+    console.error("Error withdrawing lead:", error);
+    res.status(500).send("Internal Server Error");
+  }
 });
+
 
 // GET create Lead
 

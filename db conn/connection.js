@@ -1,10 +1,13 @@
-require('dotenv').config()
+require('dotenv').config();
 const mongoose = require("mongoose");
-mongoose
-  .connect(process.env.MONGODB_URL)
-  .then(() => {
+
+async function connectToDatabase() {
+  try {
+    await mongoose.connect(process.env.MONGODB_URL);
     console.log("Db Connected Successfully");
-  })
-  .catch((e) => {
-    console.log(e);
-  });
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+connectToDatabase();

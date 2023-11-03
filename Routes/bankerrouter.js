@@ -357,6 +357,8 @@ router.get(
   authenticateToken,
   bankerCheck,
   async (req, res) => {
+  console.log(req.banker.id);
+
     try {
       const bankerLeads = await Banker.findById(req.banker.id).populate(
         "leads"

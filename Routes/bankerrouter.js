@@ -337,6 +337,7 @@ router.get("/createLead", authenticateToken, bankerCheck, (req, res) => {
 
 //GET for banker dashboard
 router.get("/dashboard", authenticateToken, bankerCheck, (req, res) => {
+  console.log(req.banker.id);
   res.render("DashBoard/BankerHomeDashBoard");
 });
 

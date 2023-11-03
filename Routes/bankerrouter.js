@@ -20,7 +20,6 @@ function checkApproval(req, res, next) {
 
   Banker.find({ email })
     .then((result) => {
-      console.log(result);
       if (result && result.length > 0) {
         if (result[0].approval) {
           next();
@@ -317,6 +316,7 @@ router.post("/createLead", authenticateToken, bankerCheck, async (req, res) => {
 
 function bankerCheck(req, res, next) {
   Banker.findById(req.banker.id).then((results) => {
+    console.log(results);
     if (results && results.approval) next();
     else return res.send("You are not a Banker or You are not approved from ADMIN");
   });

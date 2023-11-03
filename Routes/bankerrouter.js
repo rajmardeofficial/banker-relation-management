@@ -26,7 +26,7 @@ function checkApproval(req, res, next) {
           next();
         } else {
           res.send(
-            "You are not approved as Banker; please wait for the approval"
+            "You are not approved as Banker; please wait for the approval..."
           );
         }
       } else {

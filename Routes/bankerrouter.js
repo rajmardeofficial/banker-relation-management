@@ -20,6 +20,7 @@ function checkApproval(req, res, next) {
 
   Banker.find({ email })
     .then((result) => {
+      console.log(result);
       if (result && result.length > 0) {
         if (result[0].approval) {
           next();

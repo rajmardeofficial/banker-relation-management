@@ -225,7 +225,11 @@
                             </td>
                             <td>
                               <span class="cell-label"></span>
-                              <%= lead.banker.firstName %> <%= lead.banker.lastName %>
+                              <% if (lead.banker) { %>
+                                <%= lead.banker.firstName %> <%= lead.banker.lastName %>
+                              <% } else { %>
+                                <p>No Leads if you think its present contact developer to fix this issue</p>
+                              <% } %>
                             </td>
 
                 </tr>

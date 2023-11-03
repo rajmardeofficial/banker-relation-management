@@ -75,6 +75,9 @@
               >View Profile</a
             >
           </button>
+          <button class="btn btn-secondary" onclick="location.reload();">
+            Refresh Page
+          </button>
         </div>
 
         <!-- Table starts here -->
@@ -83,7 +86,7 @@
             <tr>
               <th>Lead ID</th>
               <th>Lead Generation Date</th>
-              <th>Progress Status</th>
+              <th>Lead Status</th>
               <th>Mobile</th>
               <th>Service</th>
               <th>Remarks</th>
@@ -98,8 +101,9 @@
               Please <a href="/banker/createLead">create Lead</a> to display
               them
             </p>
-            <% } else { %> <% leads.forEach(function (lead) { %> <% if (lead) {
-            %> <% lead.services.forEach(function (service) { %> <%
+            <% } else { %> <% leads.slice().reverse().forEach(function (lead) {
+            %> <% if (lead) { %> <%
+            lead.services.slice().reverse().forEach(function (service) { %> <%
             if(service.isActive){ %>
             <tr>
               <td><%= lead.leadId %></td>

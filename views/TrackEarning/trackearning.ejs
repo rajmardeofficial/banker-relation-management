@@ -63,6 +63,9 @@
               >View Profile</a
             >
           </button>
+          <button class="btn btn-secondary" onclick="location.reload();">
+            Refresh Page
+          </button>
         </div>
 
         <!-- Table starts here -->
@@ -78,11 +81,11 @@
             </tr>
           </thead>
           <tbody>
-            <% leads.forEach(function (lead) { %>
+            <% leads.slice().reverse().forEach(function (lead) { %>
               <% if (lead && lead.services) { %>
                 <% const completedServices = lead.services.filter(service => service.status === 'completed'); %>
                 <% if (completedServices.length > 0) { %>
-                  <% completedServices.forEach(service => { %>
+                  <% completedServices.slice().reverse().forEach(service => { %>
                     <tr>
                       <td><%= lead.leadId %></td>
                       <% const date = new Date(lead.generationDate); %>

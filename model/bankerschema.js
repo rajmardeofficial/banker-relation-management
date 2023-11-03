@@ -31,14 +31,15 @@ const Schema = mongoose.Schema({
     ref: "RelationManager",
   },
   leads: [
-    {
-      lead: { type: mongoose.Types.ObjectId, ref: "Lead" },
-    },
+    { type: mongoose.Types.ObjectId, ref: "Lead" },
   ],
+  approval: {
+    type: Boolean,
+    default: false,
+  },
   bankDetails: {
     accountNumber: { type: Number, required: true },
     ifsc: { type: String, required: true },
-    upi: { type: String, required: true },
   },
   bankerId: {
     type: String,

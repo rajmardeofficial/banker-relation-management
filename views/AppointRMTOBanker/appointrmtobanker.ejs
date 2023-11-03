@@ -1,42 +1,212 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" data-bs-theme="auto">
   <head>
-    <title>Add Service</title>
-    <link rel="stylesheet" href="/AppointRM/appointrmtobanker.css" />
-    <link rel="stylesheet" href="/adminMain.css" />
+    <script src="../assets/js/color-modes.js"></script>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="" />
+    <meta
+      name="author"
+      content="Mark Otto, Jacob Thornton, and Bootstrap contributors"
+    />
+    <meta name="generator" content="Hugo 0.118.2" />
+    <title>Admin Dasboard</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+      integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+      integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+      crossorigin="anonymous"
+    />
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
+      integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
+      crossorigin="anonymous"
+    ></script>
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+
+      .b-example-divider {
+        width: 100%;
+        height: 3rem;
+        background-color: rgba(0, 0, 0, 0.1);
+        border: solid rgba(0, 0, 0, 0.15);
+        border-width: 1px 0;
+        box-shadow: inset 0 0.5em 1.5em rgba(0, 0, 0, 0.1),
+          inset 0 0.125em 0.5em rgba(0, 0, 0, 0.15);
+      }
+
+      .b-example-vr {
+        flex-shrink: 0;
+        width: 1.5rem;
+        height: 100vh;
+      }
+
+      .bi {
+        vertical-align: -0.125em;
+        fill: currentColor;
+      }
+
+      .nav-scroller {
+        position: relative;
+        z-index: 2;
+        height: 2.75rem;
+        overflow-y: hidden;
+      }
+
+      .nav-scroller .nav {
+        display: flex;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        margin-top: -1px;
+        overflow-x: auto;
+        text-align: center;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .btn-bd-primary {
+        --bd-violet-bg: #712cf9;
+        --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
+
+        --bs-btn-font-weight: 600;
+        --bs-btn-color: var(--bs-white);
+        --bs-btn-bg: var(--bd-violet-bg);
+        --bs-btn-border-color: var(--bd-violet-bg);
+        --bs-btn-hover-color: var(--bs-white);
+        --bs-btn-hover-bg: #6528e0;
+        --bs-btn-hover-border-color: #6528e0;
+        --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
+        --bs-btn-active-color: var(--bs-btn-hover-color);
+        --bs-btn-active-bg: #5a23c8;
+        --bs-btn-active-border-color: #5a23c8;
+      }
+
+      .bd-mode-toggle {
+        z-index: 1500;
+      }
+
+      .bd-mode-toggle .dropdown-menu .active .bi {
+        display: block !important;
+      }
+    </style>
+
+    <!-- Custom styles for this template -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
+    <!-- Custom styles for this template -->
+    <link href="/Admin/admin.css" rel="stylesheet" />
   </head>
+
   <body>
-    <div class="wrapper">
-      <!-- Include the sidebar -->
-      <%- include('../Utils/sidebar.ejs') %>
-      <div id="Add-RM-to-Banker-Container">
-        <h1>Appoint Relationship Manager To Banker</h1>
-        <form id="Add-RM-to-Banker-form" method="post" action="/admin/appointRm">
-          <label for="service">Relationship Manager:</label><br />
-          <select id="service" name="relationManager" required>
-            <!-- Add options for Relationship Manager here -->
-            <% rm.forEach((rm)=>{ %> <% const name = rm.firstName + " " +
-            rm.lastName %>
-            <option value="<%= rm._id %>"><%= name %></option>
-            <% }) %>
-            <!-- Add more options as needed --></select
-          ><br />
+    <header
+      class="navbar sticky-top bg-dark flex-md-nowrap p-0 shadow"
+      data-bs-theme="dark"
+    >
+      <a
+        class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6 text-white"
+        href="#"
+        >Bankers Partner</a
+      >
 
-          <label for="payment">Banker:</label><br />
-          <select id="payment" name="banker" required>
-            <!-- Add options for Banker here -->
-            <% bankers.forEach((banker)=>{ %> <% const name = banker.firstName +
-            " " + banker.lastName %>
-            <option value="<%= banker._id %>"><%= name %></option>
-            <% }) %>
-            <!-- Add more options as needed --></select
-          ><br />
+      <ul class="navbar-nav flex-row d-md-none">
+        <li class="nav-item text-nowrap">
+          <button
+            style="border: none; border-radius: 10px"
+            class="nav-link px-3 text-black"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#sidebarMenu"
+            aria-controls="sidebarMenu"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <svg class="bi">
+              <use xlink:href="#list" />
+            </svg>
+          </button>
+        </li>
+      </ul>
+    </header>
 
-          <button type="submit" id="add-button">Submit</button>
-        </form>
+    <div class="container-fluid">
+      <div class="row">
+        <%- include('../Utils/sidebar.ejs') %>
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+          <h2>Appoint Relation Manager</h2>
+          <hr />
+          <form
+            id="Add-RM-to-Banker-form"
+            method="post"
+            action="/admin/appointRm"
+          >
+            <div class="form-group">
+              <label for="service">Relationship Manager:</label>
+              <select
+                id="service"
+                name="relationManager"
+                class="form-control"
+                required
+              >
+                <!-- Add options for Relationship Manager here -->
+                <% rm.forEach((rm) => { %> <% const name = rm.firstName + " " +
+                rm.lastName %>
+                <option value="<%= rm._id %>"><%= name %></option>
+                <% }) %>
+                <!-- Add more options as needed -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="payment">Banker:</label>
+              <select id="payment" name="banker" class="form-control" required>
+                <!-- Add options for Banker here -->
+                <% bankers.forEach((banker) => { %> <% const name =
+                banker.firstName + " " + banker.lastName %>
+                <option value="<%= banker._id %>"><%= name %></option>
+                <% }) %>
+                <!-- Add more options as needed -->
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="add-button">
+              Submit
+            </button>
+          </form>
+        </main>
       </div>
     </div>
 
-    <script src="/AddService/addservice.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/chart.js@4.3.2/dist/chart.umd.js"
+      integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp"
+      crossorigin="anonymous"
+    ></script>
   </body>
 </html>

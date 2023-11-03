@@ -24,6 +24,7 @@ body {
   background-color: var(--white); /* Use --white here */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-y: auto;
 }
 
 .app-icon {

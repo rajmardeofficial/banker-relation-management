@@ -13,7 +13,7 @@ app.set("views", path.join(__dirname, "views"));
 // Serve static assets (e.g., CSS and JavaScript) from the public folder
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use(express.json());
+app.use(express.json());  
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 

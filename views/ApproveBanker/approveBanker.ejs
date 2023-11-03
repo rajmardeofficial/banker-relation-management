@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="auto">
   <head>
-    <script src="../assets/js/color-modes.js"></script>
-
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="" />
@@ -159,61 +157,35 @@
         <%- include('../Utils/sidebar.ejs') %>
 
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-          <h2>Update Services</h2>
+          <h2>Banker Approval Requests</h2>
           <hr />
-          <form
-            id="update-service-form"
-            method="post"
-            action="/admin/updateservice"
-          >
-            <div class="form-group">
-              <label for="service">Service:</label>
-              <select
-                id="service"
-                name="serviceId"
-                class="form-control"
-                onchange="updateServiceInfo()"
-                required
+          <div id="add-service-container" class="container mt-5">
+            <ul class="list-group" id="nameList">
+              <% bankers.forEach(banker => { %>
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
               >
-                <!-- Add options for services here -->
-                <% services.forEach((service) => { %>
-                <option
-                  value="<%= service._id %>"
-                  data-fees="<%= service.standardFees %>"
-                >
-                  <%= service.serviceName %>
-                </option>
-                <% }) %>
-                <!-- Add more options as needed -->
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="textInput">Service Name:</label>
-              <input
-                type="text"
-                class="form-control"
-                id="textInput"
-                name="updatedServiceName"
-                required
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="standardFees">Standard Fees:</label>
-              <input
-                type="number"
-                class="form-control"
-                id="standardFees"
-                name="standardFees"
-                required
-              />
-            </div>
-
-            <button type="submit" class="btn btn-primary" id="add-button">
-              Update Service
-            </button>
-          </form>
+                <span class="name"
+                  ><%= banker.firstName %> <%= banker.lastName %>
+                </span>
+                <div class="button-column">
+                  <button
+                    class="btn btn-success mr-2"
+                    onclick="handleAction('<%= banker._id %>', 'approve')"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    class="btn btn-danger"
+                    onclick="handleAction('<%= banker._id %>', 'reject')"
+                  >
+                    Reject
+                  </button>
+                </div>
+              </li>
+              <% }) %>
+            </ul>
+          </div>
         </main>
       </div>
     </div>
@@ -223,20 +195,6 @@
       integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp"
       crossorigin="anonymous"
     ></script>
-    <script>
-      function updateServiceInfo() {
-        var selectedService = document.getElementById("service");
-        var serviceNameInput = document.getElementById("textInput");
-        var standardFeesInput = document.getElementById("standardFees");
-
-        var selectedOption =
-          selectedService.options[selectedService.selectedIndex];
-
-        // Set the service name and standard fees
-        serviceNameInput.value = selectedOption.text;
-        standardFeesInput.value =
-          selectedOption.getAttribute("data-fees") || "";
-      }
-    </script>
+    <script src="/ApproveBanker/approveBanker.js"></script>
   </body>
 </html>

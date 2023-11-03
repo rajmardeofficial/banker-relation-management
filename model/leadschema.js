@@ -79,6 +79,10 @@ const leadSchema = new Schema({
       }
     },
   ],
+
+
+  banker: { type: mongoose.Types.ObjectId, ref: "Banker" },
+
   phone: {
     type: Number,
     required: true,

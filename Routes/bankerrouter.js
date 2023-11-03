@@ -14,6 +14,30 @@ const mongoose = require("mongoose");
 const RM = require("../model/rmschema");
 const changepassword = require("../utils/changepassword");
 
+//Approval Function
+function checkApproval(req, res, next) {
+  const { email } = req.body;
+
+  Banker.find({ email })
+    .then((result) => {
+      if (result && result.length > 0) {
+        if (result[0].approval) {
+          next();
+        } else {
+          res.send(
+            "You are not approved as Banker; please wait for the approval"
+          );
+        }
+      } else {
+        res.status(404).send("Banker not found");
+      }
+    })
+    .catch((err) => {
+      console.error("Error while checking approval:", err);
+      res.status(500).send("Internal Server Error");
+    });
+}
+
 // Banker Signup
 
 router.post("/signup", async (req, res) => {
@@ -26,7 +50,6 @@ router.post("/signup", async (req, res) => {
     password,
     accountNumber,
     ifsc,
-    upi,
   } = req.body;
   const saltRounds = 10;
 
@@ -50,7 +73,6 @@ router.post("/signup", async (req, res) => {
       bankDetails: {
         accountNumber: accountNumber,
         ifsc: ifsc,
-        upi: upi,
       },
     });
 
@@ -64,7 +86,7 @@ router.post("/signup", async (req, res) => {
 });
 
 // Banker Login
-router.post("/login", (req, res) => {
+router.post("/login", checkApproval, (req, res) => {
   let banker;
   login(banker, Banker, req, res, "/banker/dashboard");
 });
@@ -89,45 +111,45 @@ function authenticateToken(req, res, next) {
 //Create Lead
 
 // Function to generate the leadId
-async function generateLeadId() {
-  const currentDate = new Date();
-  const day = currentDate.getDate().toString().padStart(2, "0");
-  const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
-  const year = currentDate.getFullYear().toString().substr(-2);
+// async function generateLeadId() {
+//   const currentDate = new Date();
+//   const day = currentDate.getDate().toString().padStart(2, "0");
+//   const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
+//   const year = currentDate.getFullYear().toString().substr(-2);
 
-  try {
-    const lastLead = await Lead.findOne({
-      generationDate: {
-        $gte: new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate()
-        ),
-        $lt: new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() + 1
-        ),
-      },
-    }).sort({ leadId: -1 });
+//   try {
+//     const lastLead = await Lead.findOne({
+//       generationDate: {
+//         $gte: new Date(
+//           currentDate.getFullYear(),
+//           currentDate.getMonth(),
+//           currentDate.getDate()
+//         ),
+//         $lt: new Date(
+//           currentDate.getFullYear(),
+//           currentDate.getMonth(),
+//           currentDate.getDate() + 1
+//         ),
+//       },
+//     }).sort({ leadId: -1 });
 
-    let sequenceNumber;
+//     let sequenceNumber;
 
-    if (lastLead) {
-      sequenceNumber = parseInt(lastLead.leadId.slice(-5)) + 1;
-    } else {
-      sequenceNumber = 1;
-    }
+//     if (lastLead) {
+//       sequenceNumber = parseInt(lastLead.leadId.slice(-5)) + 1;
+//     } else {
+//       sequenceNumber = 1;
+//     }
 
-    const sequenceSuffix = sequenceNumber.toString().padStart(5, "0");
-    const leadId = `${day}${month}${year}${sequenceSuffix}`;
+//     const sequenceSuffix = sequenceNumber.toString().padStart(5, "0");
+//     const leadId = `${day}${month}${year}${sequenceSuffix}`;
 
-    return leadId;
-  } catch (error) {
-    console.error("Error generating leadId:", error);
-    throw error;
-  }
-}
+//     return leadId;
+//   } catch (error) {
+//     console.error("Error generating leadId:", error);
+//     throw error;
+//   }
+// }
 
 router.post("/editLead/:id/:serviceId", async (req, res) => {
   try {
@@ -200,7 +222,7 @@ router.post("/withdrawLead/:id", (req, res) => {
   });
 });
 
-router.post("/createLead", authenticateToken, async (req, res) => {
+router.post("/createLead", authenticateToken, bankerCheck, async (req, res) => {
   try {
     // Extract data from the request body
     const { firstName, lastName, phone, services } = req.body;
@@ -258,6 +280,7 @@ router.post("/createLead", authenticateToken, async (req, res) => {
       phone,
       services: updatedServices,
       payoutAmount,
+      banker: req.banker.id,
       createdby: "banker",
       // Add other lead properties as needed
     });
@@ -274,7 +297,7 @@ router.post("/createLead", authenticateToken, async (req, res) => {
     }
 
     // Push the lead's ID into the leads array of the associated Banker
-    banker.leads.push({ lead: lead._id });
+    banker.leads.push(lead._id);
 
     // Save the updated Banker
     await banker.save();
@@ -293,8 +316,8 @@ router.post("/createLead", authenticateToken, async (req, res) => {
 
 function bankerCheck(req, res, next) {
   Banker.findById(req.banker.id).then((results) => {
-    if (results) next();
-    else return res.send("You are not a Banker: Access Denied");
+    if (results && results.approval) next();
+    else return res.send("You are not a Banker or You are not approved from ADMIN");
   });
 }
 
@@ -334,9 +357,11 @@ router.get(
   async (req, res) => {
     try {
       const bankerLeads = await Banker.findById(req.banker.id).populate(
-        "leads.lead"
+        "leads"
       );
-      const leads = bankerLeads.leads.map((lead) => lead.lead);
+
+      console.log(bankerLeads);
+      const leads = bankerLeads.leads.map((lead) => lead);
 
       res.render("TrackEarning/trackearning", { leads });
     } catch (error) {
@@ -350,9 +375,9 @@ router.get(
 router.get("/tracklead", authenticateToken, bankerCheck, async (req, res) => {
   try {
     const bankerLeads = await Banker.findById(req.banker.id).populate(
-      "leads.lead"
+      "leads"
     );
-    const leads = bankerLeads.leads.map((lead) => lead.lead);
+    const leads = bankerLeads.leads.map((lead) => lead);
     res.render("TrackLead/tracklead", { leads });
   } catch (error) {
     console.error("Error in tracklead route:", error);
@@ -360,7 +385,7 @@ router.get("/tracklead", authenticateToken, bankerCheck, async (req, res) => {
   }
 });
 
-router.get("/editLead/:id/:serviceId",authenticateToken, bankerCheck, async (req, res) => {
+router.get("/editLead/:id/:serviceId", authenticateToken, bankerCheck, async (req, res) => {
   try {
     const id = req.params.id;
     const serviceId = req.params.serviceId;
@@ -401,7 +426,7 @@ router.get("/editLead/:id/:serviceId",authenticateToken, bankerCheck, async (req
 });
 
 // Download excel sheet here
-router.get("/download",authenticateToken, bankerCheck, async (req, res) => {
+router.get("/download", authenticateToken, bankerCheck, async (req, res) => {
   try {
     // Fetch leads data from the database
     const leads = await Lead.find();
@@ -456,7 +481,7 @@ router.post("/changePassword", authenticateToken, bankerCheck, (req, res) => {
 });
 
 //See profile
-router.get("/profile",authenticateToken, bankerCheck,(req, res) => {
+router.get("/profile", authenticateToken, bankerCheck, (req, res) => {
   Banker.findById(req.banker.id).then((banker) => {
     RM.findById(banker.rm).then((rm) => {
       console.log(rm);
@@ -464,4 +489,29 @@ router.get("/profile",authenticateToken, bankerCheck,(req, res) => {
     });
   });
 });
+
+//Edit Profile
+router.get('/editProfile', authenticateToken, bankerCheck, async (req, res) => {
+  const id = req.banker.id
+  const banker = await Banker.findById(id)
+  console.log(banker);
+  res.render('EditBankerProfile/editProfile', { banker, id })
+})
+
+//Edit Profile
+router.post('/editProfile/:id', (req, res) => {
+  const id = req.params.id
+  const { firstName, lastName, email, phone, pan, accountNumber, ifsc } = req.body
+  console.log(req.body);
+  const update = {
+    firstName,
+    lastName,
+    email,
+    phone,
+    pan,
+    'bankDetails.accountNumber': accountNumber,
+    ifsc
+  }
+  Banker.findByIdAndUpdate(id, update).then(result => res.redirect('/banker/profile'))
+})
 module.exports = router;

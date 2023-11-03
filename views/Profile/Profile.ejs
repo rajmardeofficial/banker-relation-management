@@ -28,7 +28,16 @@
 
       <!-- Personal Information -->
       <div class="card">
-        <div class="card-header">Personal Information</div>
+        <div class="card-header">
+          Personal Information
+          <button class="btn btn-primary">
+            <a
+              href="/banker/editProfile"
+              style="text-decoration: none; color: white"
+              >Edit Profile</a
+            >
+          </button>
+        </div>
         <div class="card-body">
           <% const name = banker.firstName + " " + banker.lastName %>
           <p><strong>Name: </strong><%= name %></p>
@@ -36,6 +45,7 @@
 
           <% if(rm){ %> <% const rmName = rm.firstName + " " + rm.lastName %>
           <p><strong>Relationship Manager:</strong> <%= rmName %></p>
+          <p><strong>Relationship Manager Phone:</strong> <%= rm.phone %></p>
           <% } else { %>
           <p><strong>Relationship Manager:</strong> No Rm</p>
           <% }%>
@@ -51,7 +61,7 @@
             banker.bankDetails.accountNumber %>
           </p>
           <p><strong>IFSC:</strong> <%= banker.bankDetails.ifsc %></p>
-          <p><strong>UPI ID:</strong> <%= banker.bankDetails.upi %></p>
+          <!-- <p><strong>UPI ID:</strong> <%= banker.bankDetails.upi %></p> -->
         </div>
       </div>
 

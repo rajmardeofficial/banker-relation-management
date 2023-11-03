@@ -1,54 +1,114 @@
-<!-- sidebar.ejs -->
+<div class="sidebar border border-right col-md-3 col-lg-2 p-0 bg-body-tertiary">
+  <div
+    class="offcanvas-md offcanvas-end bg-body-tertiary"
+    tabindex="-1"
+    id="sidebarMenu"
+    aria-labelledby="sidebarMenuLabel"
+  >
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="sidebarMenuLabel">Company name</h5>
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="offcanvas"
+        data-bs-target="#sidebarMenu"
+        aria-label="Close"
+      ></button>
+    </div>
+    <div
+      class="offcanvas-body d-md-flex flex-column p-0 pt-lg-3 overflow-y-auto"
+    >
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a
+            class="nav-link d-flex align-items-center gap-2 active"
+            aria-current="page"
+            href="/admin"
+          >
+            <i class="fa-solid fa-gauge"></i>
+            Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-2" href="/admin/addrm">
+            <i class="fa-solid fa-user"></i>
+            Add Relation Manager
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-2" href="/admin/updateRm">
+            <i class="fa-solid fa-user-pen"></i>
+            Update Relation Manager
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-2" href="/admin/appointRm">
+            <i class="fa-solid fa-hand-holding-hand"></i>
+            Appoint Relation Manager to Banker
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-2" href="/admin/approveAdminReq">
+            <i class="fa-solid fa-person-circle-check"></i>
+            Approve Admin Requests
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-2" href="/admin/approveBanker">
+            <i class="fa-solid fa-person-circle-check"></i>
+            Banker Approval
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-2" href="/admin/addServices">
+            <i class="fa-solid fa-receipt"></i>
+            Add Services
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-2" href="/admin/updateService">
+            <i class="fa-solid fa-pen"></i>
+            Update Service
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-2" href="/admin/appointedBankers">
+            <i class="fa-solid fa-list"></i>
+            Banker and Relation manager list
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-2" href="/admin/changePassword">
+            <i class="fa-solid fa-lock"></i>
+            Change Password
+          </a>
+        </li>
+      </ul>
 
-<div class="sidebar">
-  <h2>Admin Portal</h2>
-  <ul>
-    <li>
-      <a href="/admin"><i class="fas fa-home"></i>Dashboard</a>
-    </li>
-    <li>
-      <a href="/admin/addrm"
-        ><i class="fas fa-user"></i>Add Relationship Manager</a
+      <h6
+        class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-body-secondary text-uppercase"
       >
-    </li>
-    <li>
-      <a href="/admin/updateRm"
-        ><i class="fas fa-address-card"></i>Update Relationship Manager</a
-      >
-    </li>
-    <li>
-      <a href="/admin/appointRm"
-        ><i class="fas fa-user-tie"></i>Appoint Relationship Manager to
-        Banker</a
-      >
-    </li>
-    <li>
-      <a href="/admin/approveAdminReq"
-        ><i class="fas fa-check"></i>Approve Admin Request</a
-      >
-    </li>
-    <li>
-      <a href="/admin/addServices"><i class="fas fa-blog"></i>Add Services</a>
-    </li>
-    <li>
-      <a href="/admin/updateService"
-        ><i class="fas fa-pen-square"></i>Update Service</a
-      >
-    </li>
-    <li>
-      <a href="/admin/appointedBankers"
-        ><i class="fas fa-pen-square"></i>RM to Banker List</a
-      >
-    </li>
-    <li>
-      <a href="/admin/downloadBankerDetails"
-        ><i class="fas fa-lock"></i>Download Banker Details</a
-      >
-    </li>
-    <li>
-      <a href="/admin/changePassword"
-        ><i class="fas fa-lock"></i>Change Password</a
-      >
-    </li>
-  </ul>
+        <span>CSV Files</span>
+        <a class="link-secondary" href="#" aria-label="Add a new report">
+          <svg class="bi">
+            <use xlink:href="#plus-circle" />
+          </svg>
+        </a>
+      </h6>
+      <ul class="nav flex-column mb-auto">
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-2" href="/admin/downloadBankerDetails">
+            <i class="fa-solid fa-download"></i>
+            Download Bankers Details
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center gap-2" href="/admin/download">
+            <i class="fa-solid fa-download"></i>
+            Download Payout CSV
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
 </div>

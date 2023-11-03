@@ -16,7 +16,6 @@ function handleAction(adminId, action) {
       // Optionally update the UI based on the server response
       if (data.admin && action === "approve") {
         // Update the UI to indicate approval
-        alert("Admin has been approved")
         window.location.href = "/admin";
       } else if (action === "reject") {
         // Handle UI update for rejection if needed

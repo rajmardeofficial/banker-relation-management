@@ -100,7 +100,6 @@ router.post("/createLead", authenticateToken, async (req, res) => {
     // Extract data from the request body
     const { firstName, lastName, phone, services, bankersId, paymentStatus } = req.body;
 
-    console.log(req.body);
 
     // Check if the 'services' array is present
     if (!services || !Array.isArray(services)) {
@@ -161,6 +160,7 @@ router.post("/createLead", authenticateToken, async (req, res) => {
       services: updatedServices,
       payoutAmount,
       createdby: "rm",
+      banker: bankerId
       // Add other lead properties as needed
     });
 
@@ -178,7 +178,7 @@ router.post("/createLead", authenticateToken, async (req, res) => {
     }
 
     // Push the lead's ID into the leads array of the associated Banker
-    banker.leads.push({ lead: lead._id });
+    banker.leads.push(lead._id);
 
     // Save the updated Banker
     await banker.save();
@@ -308,50 +308,65 @@ router.get("/createLead", authenticateToken, rmCheck, (req, res) => {
   }
 });
 
+// Helper function to convert bankers object to array
 router.get("/trackLead", authenticateToken, rmCheck, async (req, res) => {
   try {
     const rmObjectId = new mongoose.Types.ObjectId(req.rm.id);
 
     const result = await RM.aggregate([
       { $match: { _id: rmObjectId } },
+      // { $match: { _id: ObjectId("6543fa6b9c27f8f4d6e25025") } },
       {
         $lookup: {
           from: "bankers",
           localField: "_id",
           foreignField: "rm",
-          as: "bankers",
-        },
-      },
-      {
-        $unwind: "$bankers",
+          as: "bankers"
+        }
       },
       {
         $lookup: {
           from: "leads",
-          localField: "bankers.leads.lead",
+          localField: "bankers.leads",
           foreignField: "_id",
-          as: "leads",
-        },
+          as: "leads"
+        }
       },
       {
-        $group: {
-          _id: "$_id",
-          rm: { $first: "$$ROOT" },
-          leads: { $push: "$leads" },
-        },
-      },
+        $project: {
+          _id: 1,
+          firstName: 1,
+          lastName: 1,
+          // Add other fields from the relation manager if needed
+          bankers: {
+            $map: {
+              input: "$bankers",
+              as: "banker",
+              in: {
+                _id: "$$banker._id",
+                firstName: "$$banker.firstName",
+                lastName: "$$banker.lastName",
+                // Add other fields from the banker if needed
+                leads: "$leads"
+              }
+            }
+          }
+        }
+      }
     ]);
 
     if (result.length === 0) {
       console.error("RM not found");
-      return res.status(404).send("RM not found");
+      return res.status(404).send("Leads not found");
     }
 
     // Extract the leads array from the result
-    const leads = result[0].leads.reduce((acc, lead) => acc.concat(lead), []);
+    // const leads = result[0].leads[0]; // Assuming there's only one RM
+
+    // res.json(result);
 
     res.render("TrackLeadRM/tracklead", {
-      leads,
+      result,
       user: "banker",
     });
   } catch (error) {
@@ -359,6 +374,8 @@ router.get("/trackLead", authenticateToken, rmCheck, async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+
+
 
 //Edit Lead
 

@@ -1,99 +1,300 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="/Admin/admin.css" />
-  <!-- Make sure to link your CSS file here -->
-  <link rel="stylesheet" href="/adminMain.css" />
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <!-- Include jQuery -->
-  <title>Admin Portal</title>
-</head>
-<body>
-  <div class="wrapper">
-    <!-- Include the sidebar -->
-    <%- include('../Utils/sidebar.ejs') %>
+<html lang="en" data-bs-theme="auto">
 
-    <div class="main_content">
-      <div class="info" id="content">
-        <div class="app-container">
-          <div class="app-content">
-            <div class="app-content-header">
-              <h1 class="app-content-headerText">TrackLead</h1>
-              <div class="button-container">
-                <a href="/admin/download">
-                  <button style="cursor: pointer" class="app-content-headerButton">
-                    Download CSV
-                  </button>
-                </a>
-                <div class="dropdown">
-                  <button class="dropbtn">filter</button>
-                  <div class="dropdown-content">
-                    <a href="#" data-value="all">All</a>
-                    <a href="#" data-value="Completed">Completed</a>
-                    <a href="#" data-value="Cancel">Cancel</a>
-                    <a href="#" data-value="Pending">Pending</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="app-content-actions"></div>
-            <div class="products-area-wrapper tableView">
-              <div class="products-header">
-                <div class="product-cell Id">Lead ID</div>
-                <div class="product-cell Date">Lead Generation Date</div>
-                <div class="product-cell Status">Lead Status</div>
-                <div class="product-cell Remarks">Mobile</div>
-                <div class="product-cell Remarks">Remarks</div>
-                <div class="product-cell Service">Service</div>
-                <div class="product-cell Name">Customer Name</div>
-              </div>
-              <!-- Product rows will be generated here by JavaScript -->
-              <% leads.forEach(function (lead) { %>
-                <div class="products-row">
-                  <!-- Render data from the 'dummyData' array -->
-                  <div class="product-cell image">
-                    <span><%= lead.leadId %></span>
-                  </div>
-                  <div class="product-cell category">
-                    <% const date = new Date(lead.generationDate); %> <% const formattedDate = date.toDateString(); %>
-                    <span><%= formattedDate %></span>
-                  </div>
-                  <div class="product-cell status-cell">
-                    <span class="cell-label">Status:</span>
-                    <span class="status <%= lead.paymentStatus ? 'completed' : 'pending' %>">
-                      <%= lead.paymentStatus ? 'Completed' : 'Pending' %>
-                    </span>
-                  </div>
-                  <div class="product-cell sales">
-                    <span class="cell-label">Mobile:</span><%= lead.phone %>
-                  </div>
-                  <div class="product-cell sales">
-                    <span class="cell-label">Remarks:</span>
-                    <% if (lead.services.length > 0) { %>
-                      <%= lead.services[0].remark %>
-                    <% } %>
-                  </div>
-                  <div class="product-cell stock">
-                    <span class="cell-label">Service:</span>
-                    <% if (lead.services.length > 0) { %>
-                      <%= lead.services[0].serviceName %>
-                    <% } %>
-                  </div>
-                  <div class="product-cell price">
-                    <% const name = lead.firstName + " " + lead.lastName %>
-                    <span class="cell-label">Name:</span><%= name %>
-                  </div>
-                  <!-- ... -->
-                </div>
-              <% }); %>
-            </div>
-          </div>
-        </div>
+<head>
+  <script src="../assets/js/color-modes.js"></script>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="" />
+  <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors" />
+  <meta name="generator" content="Hugo 0.118.2" />
+  <title>Admin Dasboard</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+    integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous" />
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"
+    integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V"
+    crossorigin="anonymous"></script>
+
+  <style>
+    .bd-placeholder-img {
+      font-size: 1.125rem;
+      text-anchor: middle;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      user-select: none;
+    }
+
+    @media (min-width: 768px) {
+      .bd-placeholder-img-lg {
+        font-size: 3.5rem;
+      }
+    }
+
+    .b-example-divider {
+      width: 100%;
+      height: 3rem;
+      background-color: rgba(0, 0, 0, 0.1);
+      border: solid rgba(0, 0, 0, 0.15);
+      border-width: 1px 0;
+      box-shadow: inset 0 0.5em 1.5em rgba(0, 0, 0, 0.1),
+        inset 0 0.125em 0.5em rgba(0, 0, 0, 0.15);
+    }
+
+    .b-example-vr {
+      flex-shrink: 0;
+      width: 1.5rem;
+      height: 100vh;
+    }
+
+    .bi {
+      vertical-align: -0.125em;
+      fill: currentColor;
+    }
+
+    .nav-scroller {
+      position: relative;
+      z-index: 2;
+      height: 2.75rem;
+      overflow-y: hidden;
+    }
+
+    .nav-scroller .nav {
+      display: flex;
+      flex-wrap: nowrap;
+      padding-bottom: 1rem;
+      margin-top: -1px;
+      overflow-x: auto;
+      text-align: center;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .btn-bd-primary {
+      --bd-violet-bg: #712cf9;
+      --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
+
+      --bs-btn-font-weight: 600;
+      --bs-btn-color: var(--bs-white);
+      --bs-btn-bg: var(--bd-violet-bg);
+      --bs-btn-border-color: var(--bd-violet-bg);
+      --bs-btn-hover-color: var(--bs-white);
+      --bs-btn-hover-bg: #6528e0;
+      --bs-btn-hover-border-color: #6528e0;
+      --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
+      --bs-btn-active-color: var(--bs-btn-hover-color);
+      --bs-btn-active-bg: #5a23c8;
+      --bs-btn-active-border-color: #5a23c8;
+    }
+
+    .bd-mode-toggle {
+      z-index: 1500;
+    }
+
+    .bd-mode-toggle .dropdown-menu .active .bi {
+      display: block !important;
+    }
+  </style>
+
+  <!-- Custom styles for this template -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <!-- Custom styles for this template -->
+  <link href="/Admin/admin.css" rel="stylesheet" />
+</head>
+
+<body>
+  <header class="navbar sticky-top bg-dark flex-md-nowrap p-0 shadow" data-bs-theme="dark">
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6 text-white" href="#">
+      <img src="/BankersRelationManagement.png" alt="" width="40px" style="background-color: white;">
+      Bankers Partner
+    </a>
+
+    
+
+    <ul class="navbar-nav flex-row d-md-none">
+      <li class="nav-item text-nowrap">
+        <button style="border: none; border-radius: 10px;" class="nav-link px-3 text-black" type="button"
+          data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false"
+          aria-label="Toggle navigation">
+          <svg class="bi">
+            <use xlink:href="#list" />
+          </svg>
+        </button>
+      </li>
+    </ul>
+
+    <div id="navbarSearch" class="navbar-search w-100 collapse">
+      <input class="form-control w-100 rounded-0 border-0" type="text" placeholder="Search" aria-label="Search" />
+    </div>
+
+    <div class="input-group">
+      <div class="form-outline">
+        <input id="searchbar" onkeyup="search_lead()" type="text" name="search" placeholder="Search Leads..">
       </div>
     </div>
+
+    <div class="input-group-append">
+      <label for="filterDropdown" class="visually-hidden">Filter by Status:</label>
+      <select id="filterDropdown" class="form-select" onchange="filterLeads(this.value)">
+        <option value="All">All</option>
+        <option value="Completed">Completed</option>
+        <option value="Pending">Pending</option>
+        <option value="Cancel">Cancel</option>
+      </select>
+    </div>
+  </header>
+
+  <div class="container-fluid">
+    <div class="row">
+      <%- include('../Utils/sidebar.ejs') %>
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+          <h2>Track Lead</h2>
+          <hr />
+          <div class="table-responsive small">
+            <table class="table table-striped table-sm">
+              <thead>
+                <tr>
+                  <th scope="col">Lead Id</th>
+                  <th scope="col">Customer Name</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Lead Status</th>
+                  <th scope="col">Mobile</th>
+                  <th scope="col">Remark</th>
+                  <th scope="col">Service</th>
+                  <th scope="col">Banker</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <% if(leads.length <=0){ %>
+                    <h3 style="color: red">No Leads To Show</h3>
+                    <p style="color: red">
+                      Please <a href="/banker/createLead">create Lead</a> to display
+                      them
+                    </p>
+                    <% } else { %>
+                      <% leads.slice().reverse().forEach(function (lead) { %>
+                        <% if (lead) { %>
+                          <% lead.services.slice().reverse().forEach(function (service) { %>
+                            <% if(service.isActive){ %>
+                <tr>
+                  <td>
+                    <%= lead.leadId %>
+                  </td>
+
+                  <% const name=lead.firstName + " " + lead.lastName %>
+                    <td><span class="cell-label"></span>
+                      <%= name %>
+                    </td>
+
+                    <% const date=new Date(lead.generationDate); %>
+                      <% const day=date.getDate().toString().padStart(2, '0' ); %>
+                        <% const month=(date.getMonth() + 1).toString().padStart(2, '0' ); %>
+                          <% const year=date.getFullYear().toString().substr(-2); %>
+                            <td>
+                              <%= `${day}/${month}/${year}` %>
+                            </td>
+
+                            <td>
+                              <span class="cell-label"></span>
+                              <% const status=service.status %>
+                                <span
+                                  class="status <%= status.toLowerCase() === 'completed' ? 'status-paid' : 'status-due' %>">
+                                  <%= status.toUpperCase() %>
+                                </span>
+                            </td>
+                            <td><span class="cell-label"></span>
+                              <%= lead.phone %>
+                            </td>
+                            <td>
+                              <span class="cell-label"></span>
+                              <%= service.remark %>
+                            </td>
+                            <td>
+                              <span class="cell-label"></span>
+                              <%= service.serviceName %>
+                            </td>
+                            <td>
+                              <span class="cell-label"></span>
+                              <%= lead.banker.firstName %> <%= lead.banker.lastName %>
+                            </td>
+
+                </tr>
+                <% } %>
+                  <% }); %>
+                    <% } %>
+                      <% }); %>
+                        <% } %>
+                          </tr>
+              </tbody>
+            </table>
+          </div>
+        </main>
+    </div>
   </div>
-  <script src="/Admin/admin.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.2/dist/chart.umd.js"
+    integrity="sha384-eI7PSr3L1XLISH8JdDII5YN/njoSsxfbrkCTnJrzXt+ENP5MOVBxD+l6sEG4zoLp"
+    crossorigin="anonymous"></script>
+  <script>
+    function search_lead() {
+      let input = document.getElementById('searchbar').value.toLowerCase();
+      let table = document.querySelector('.table tbody');
+      let rows = table.getElementsByTagName('tr');
+
+      for (let i = 0; i < rows.length; i++) {
+        let cells = rows[i].getElementsByTagName('td');
+        let found = false;
+
+        for (let j = 0; j < cells.length; j++) {
+          if (cells[j].innerHTML.toLowerCase().includes(input)) {
+            found = true;
+            break;
+          }
+        }
+
+        if (found) {
+          rows[i].style.display = "";
+        } else {
+          rows[i].style.display = "none";
+        }
+      }
+    }
+
+    function filterLeads(status) {
+    let input = document.getElementById('searchbar').value.toLowerCase();
+    let table = document.querySelector('.table tbody');
+    let rows = table.getElementsByTagName('tr');
+
+    for (let i = 0; i < rows.length; i++) {
+      let cells = rows[i].getElementsByTagName('td');
+      let found = false;
+
+      for (let j = 0; j < cells.length; j++) {
+        if (cells[j].innerHTML.toLowerCase().includes(input)) {
+          found = true;
+          break;
+        }
+      }
+
+      // Check if the status filter matches
+      if (found && (status === 'All' || cells[3].innerText.toLowerCase().includes(status.toLowerCase()))) {
+        rows[i].style.display = "";
+      } else {
+        rows[i].style.display = "none";
+      }
+    }
+  }
+  </script>
 </body>
+
 </html>

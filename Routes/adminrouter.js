@@ -85,6 +85,45 @@ router.post(
   }
 );
 
+// POST route to handle banker approval
+router.post(
+  "/approveBanker",
+  authenticateToken,
+  adminCheck,
+  async (req, res) => {
+    const { bankerId, action } = req.body;
+
+    try {
+      // Find the admin by ID
+      const banker = await Banker.findById(bankerId);
+
+      if (!banker) {
+        return res.status(404).json({ error: "Banker not found" });
+      }
+
+      // Update the approval status based on the action
+      if (action === "approve") {
+        banker.approval = true;
+      } else if (action === "reject") {
+        // Optionally handle rejection logic, e.g., remove the banker from the database
+        await Admin.findByIdAndDelete(bankerId);
+        return res.json({ message: "Banker rejected and removed" });
+      } else {
+        return res.status(400).json({ error: "Invalid action" });
+      }
+
+      // Save the changes
+      await banker.save();
+
+      // Respond with a success message
+      res.json({ message: "Action successful", banker });
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+);
+
 //Admin Signup Post Request
 router.post("/signup", (req, res) => {
   signup(Admin, req, res);
@@ -101,7 +140,7 @@ router.post("/login", checkApproval, (req, res) => {
 
 function authenticateToken(req, res, next) {
   const token = req.cookies.jwt;
-  console.log(req.cookies.jwt);
+
   if (!token) {
     return res.status(401).send("No token found"); // Send a response and return
   }
@@ -242,7 +281,6 @@ router.post("/forgotpassword", (req, res) => {
 
 // Change password Admin
 router.post("/changePassword", authenticateToken, adminCheck, (req, res) => {
-
   changepassword(Admin, req, res, req.admin.id);
 });
 
@@ -277,9 +315,11 @@ router.get("/login", (req, res) => {
 });
 
 // Get request for admin dashboard page
-router.get("/", authenticateToken, adminCheck, (req, res) => {
+router.get("/", authenticateToken, adminCheck, async (req, res) => {
   try {
-    Lead.find().then((leads) => res.render("Admin/admin", { leads }));
+    const leads = await Lead.find().populate('banker')
+    // res.json(leads)
+    res.render("Admin/admin", { leads });
   } catch (e) {
     res.send("PLEASE CONTACT DEVELOPER FOR THIS ERROR");
   }
@@ -315,6 +355,17 @@ router.get("/approveAdminReq", authenticateToken, adminCheck, (req, res) => {
   try {
     Admin.find({ approval: false }).then((admins) => {
       res.render("ApproveAdminRequest/approveadminrequest", { admins });
+    });
+  } catch (e) {
+    res.send("PLEASE CONTACT THE DEVELOPER FOR THIS ERROR: " + e);
+  }
+});
+
+//Get req to Approve Banker request
+router.get("/approveBanker", authenticateToken, adminCheck, (req, res) => {
+  try {
+    Banker.find({ approval: false }).then((bankers) => {
+      res.render("ApproveBanker/approveBanker", { bankers });
     });
   } catch (e) {
     res.send("PLEASE CONTACT THE DEVELOPER FOR THIS ERROR: " + e);
@@ -359,14 +410,14 @@ router.get(
 router.get("/download", authenticateToken, adminCheck, async (req, res) => {
   try {
     // Fetch all bankers and populate the 'leads.lead' field to get associated leads
-    const bankers = await Banker.find().populate("leads.lead");
+    const bankers = await Banker.find().populate("leads");
 
     // Convert leads data to Excel format
     const formattedLeads = [];
 
     bankers.forEach((banker) => {
       banker.leads.forEach((leadObj) => {
-        const lead = leadObj.lead;
+        const lead = leadObj;
 
         // Check if 'lead' and 'services' are defined before using them
         if (lead && lead.services && Array.isArray(lead.services)) {
@@ -384,8 +435,7 @@ router.get("/download", authenticateToken, adminCheck, async (req, res) => {
               serviceName: service.serviceName,
               amount: service.amount,
               payout: service.payout || 0,
-              bankerFirstName: banker.firstName,
-              bankerLastName: banker.lastName,
+              bankersName: banker.firstName + " " + banker.lastName
             };
 
             formattedLeads.push(formattedLead);
@@ -402,7 +452,10 @@ router.get("/download", authenticateToken, adminCheck, async (req, res) => {
       type: "buffer",
     });
 
-    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
     res.setHeader("Content-Disposition", "attachment; filename=leads.xlsx");
     res.end(excelBuffer);
   } catch (error) {
@@ -425,7 +478,6 @@ router.get("/downloadBankerDetails", async (req, res) => {
       RM: banker.rm ? `${banker.rm.firstName} ${banker.rm.lastName}` : "N/A",
       "Account Number": String(banker.bankDetails.accountNumber),
       IFSC: banker.bankDetails.ifsc,
-      UPI: banker.bankDetails.upi,
     }));
 
     const ws = xlsx.utils.json_to_sheet(data);

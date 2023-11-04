@@ -23,6 +23,7 @@ exports.login = (user, modelName, req, res, redirectURL) => {
                 domain: "bankerspartner.com",
                 sameSite: "None", // Adjust as needed
               });
+              console.log(req.user);
               res.redirect(redirectURL);
             } else {
               console.log("Password incorrect");

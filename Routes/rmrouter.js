@@ -31,13 +31,15 @@ function rmCheck(req, res, next) {
 
 function authenticateToken(req, res, next) {
   const token = req.cookies.jwt;
+  console.log(token);
   if (!token) {
     return res.status(401).send("No token found"); // Send a response and return
   }
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, rm) => {
     if (err) {
-      return res.status(403).send("Token invalid"); // Send a response and return
+      console.log('Token verification failed:', err.message);
+      return res.status(403).send("Token invalid");
     }
     req.rm = rm;
     next(); // Call next to continue to the next middleware/route
@@ -45,50 +47,51 @@ function authenticateToken(req, res, next) {
 }
 
 //Generate Id
-async function generateLeadId() {
-  const currentDate = new Date();
-  const day = currentDate.getDate().toString().padStart(2, "0");
-  const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
-  const year = currentDate.getFullYear().toString().substr(-2);
+// async function generateLeadId() {
+//   const currentDate = new Date();
+//   const day = currentDate.getDate().toString().padStart(2, "0");
+//   const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
+//   const year = currentDate.getFullYear().toString().substr(-2);
 
-  try {
-    const lastLead = await Lead.findOne({
-      generationDate: {
-        $gte: new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate()
-        ),
-        $lt: new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() + 1
-        ),
-      },
-    }).sort({ leadId: -1 });
+//   try {
+//     const lastLead = await Lead.findOne({
+//       generationDate: {
+//         $gte: new Date(
+//           currentDate.getFullYear(),
+//           currentDate.getMonth(),
+//           currentDate.getDate()
+//         ),
+//         $lt: new Date(
+//           currentDate.getFullYear(),
+//           currentDate.getMonth(),
+//           currentDate.getDate() + 1
+//         ),
+//       },
+//     }).sort({ leadId: -1 });
 
-    let sequenceNumber;
+//     let sequenceNumber;
 
-    if (lastLead) {
-      sequenceNumber = parseInt(lastLead.leadId.slice(-5)) + 1;
-    } else {
-      sequenceNumber = 1;
-    }
+//     if (lastLead) {
+//       sequenceNumber = parseInt(lastLead.leadId.slice(-5)) + 1;
+//     } else {
+//       sequenceNumber = 1;
+//     }
 
-    const sequenceSuffix = sequenceNumber.toString().padStart(5, "0");
-    const leadId = `${day}${month}${year}${sequenceSuffix}`;
+//     const sequenceSuffix = sequenceNumber.toString().padStart(5, "0");
+//     const leadId = `${day}${month}${year}${sequenceSuffix}`;
 
-    return leadId;
-  } catch (error) {
-    console.error("Error generating leadId:", error);
-    throw error;
-  }
-}
+//     return leadId;
+//   } catch (error) {
+//     console.error("Error generating leadId:", error);
+//     throw error;
+//   }
+// }
 
 //Rm can do all the things that banker can inititate
 // Create Lead, Track Lead,
 
 //Login
+
 router.post("/login", (req, res) => {
   let rm;
   login(rm, RM, req, res, "/rm/dashboard");

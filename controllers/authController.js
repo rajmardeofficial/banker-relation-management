@@ -42,8 +42,8 @@ exports.login = (user, modelName, req, res, redirectURL) => {
               }
               res.cookie("jwt", accessToken, {
                 httpOnly: true,
-                // secure: true, // Set to true for HTTPS
-                // domain: "bankerspartner.com"
+                secure: true, // Set to true for HTTPS
+                domain: "bankerspartner.com"
               });
               res.redirect(redirectURL);
             } else {

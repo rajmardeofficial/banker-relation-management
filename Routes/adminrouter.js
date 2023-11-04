@@ -16,7 +16,6 @@ const xlsx = require("xlsx");
 // Check if person is admin
 
 function adminCheck(req, res, next) {
-  console.log(req.admin);
   Admin.findById(req.admin.id).then((results) => {
     if (results) next();
     else return res.send("You are not a admin");
@@ -141,7 +140,6 @@ router.post("/login", checkApproval, (req, res) => {
 
 function authenticateToken(req, res, next) {
   const token = req.cookies.jwt;
-  console.log(token);
 
   if (!token) {
     return res.status(401).send("No token found");

@@ -141,19 +141,23 @@ router.post("/login", checkApproval, (req, res) => {
 
 function authenticateToken(req, res, next) {
   const token = req.cookies.jwt;
+  console.log(token);
 
   if (!token) {
-    return res.status(401).send("No token found"); // Send a response and return
+    return res.status(401).send("No token found");
   }
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, admin) => {
     if (err) {
-      return res.status(403).send("Token invalid"); // Send a response and return
+      console.log('Token verification failed:', err.message);
+      return res.status(403).send("Token invalid");
     }
+
     req.admin = admin;
-    next(); // Call next to continue to the next middleware/route
+    next();
   });
 }
+
 
 // Signup
 

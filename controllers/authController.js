@@ -1,4 +1,5 @@
 // authController.js
+require('dotenv').config()
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -11,16 +12,38 @@ exports.login = (user, modelName, req, res, redirectURL) => {
           if (!err) {
             if (result) {
               user = { email: email, id: results[0]._id };
-              const expirationTimeInSeconds = 3600 * 2;
+              const expirationTimeInSeconds = 3600 * 24;
               const accessToken = jwt.sign(
                 user,
                 process.env.ACCESS_TOKEN_SECRET,
                 { expiresIn: expirationTimeInSeconds }
               );
+              try {
+                const decodedToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+
+                // The decodedToken will contain the payload of the token, including the expiration time
+                console.log('Decoded Token:', decodedToken);
+
+                // Check if the token has expired
+                const isTokenExpired = Date.now() >= decodedToken.exp * 1000; // Multiply by 1000 to convert seconds to milliseconds
+                console.log('Is Token Expired?', isTokenExpired);
+
+                if (isTokenExpired) {
+                  console.log('Token has expired');
+                } else {
+                  console.log('Token is still valid');
+                }
+              } catch (error) {
+                if (error.name === 'TokenExpiredError') {
+                  console.log('Token has expired');
+                } else {
+                  console.log('Token verification failed:', error.message);
+                }
+              }
               res.cookie("jwt", accessToken, {
                 httpOnly: true,
-                secure: true, // Set to true for HTTPS
-                domain: "bankerspartner.com"
+                // secure: true, // Set to true for HTTPS
+                // domain: "bankerspartner.com"
               });
               res.redirect(redirectURL);
             } else {

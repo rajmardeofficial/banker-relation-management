@@ -19,11 +19,9 @@ exports.login = (user, modelName, req, res, redirectURL) => {
               );
               res.cookie("jwt", accessToken, {
                 httpOnly: true,
-                secure: req.secure, // Set to true for HTTPS
-                domain: "bankerspartner.com",
-                sameSite: "None", // Adjust as needed
+                secure: true, // Set to true for HTTPS
+                domain: "bankerspartner.com"
               });
-              console.log(req.user);
               res.redirect(redirectURL);
             } else {
               console.log("Password incorrect");

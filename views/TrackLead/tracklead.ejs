@@ -107,9 +107,11 @@
             if(service.isActive){ %>
             <tr>
               <td><%= lead.leadId %></td>
-              <% const date = new Date(lead.generationDate); %> <% const
-              formattedDate = date.toDateString(); %>
-              <td><%= formattedDate %></td>
+              <% const date=new Date(lead.generationDate); %>
+              <% const day=date.getDate().toString().padStart(2, '0' ); %>
+                <% const month=(date.getMonth() + 1).toString().padStart(2, '0' ); %>
+                  <% const year=date.getFullYear().toString().substr(-2); %>
+              <td><%= `${day}/${month}/${year}` %></td>
               <td>
                 <span class="cell-label">Status:</span>
                 <% const status = service.status %>

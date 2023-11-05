@@ -147,7 +147,7 @@ function authenticateToken(req, res, next) {
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, admin) => {
     if (err) {
-      console.log('Token verification failed:', err.message);
+      console.log("Token verification failed:", err.message);
       return res.status(403).send("Token invalid");
     }
 
@@ -155,7 +155,6 @@ function authenticateToken(req, res, next) {
     next();
   });
 }
-
 
 // Signup
 
@@ -188,7 +187,7 @@ router.post("/addrm", authenticateToken, adminCheck, async (req, res) => {
     const existingRM = await RM.findOne(filter);
 
     if (existingRM) {
-      return res.send("RM already exists");
+      return res.send("<h2>Relation Manager Already Exists</h2>");
     }
 
     // Save the new RM in the database
@@ -240,10 +239,10 @@ router.post("/addservice", authenticateToken, adminCheck, (req, res) => {
       };
       const result = await Service.findOne(filter);
       if (result) {
-        res.send("Service already exists");
+        res.send("<h2>Service already exists</h2>");
       } else {
         service.save().then((results) => {
-          res.send("data saved(Service added)");
+          res.send("<h2>data saved: Service added</h2>");
         });
       }
     } catch (err) {
@@ -293,7 +292,7 @@ router.post("/appointRm", authenticateToken, adminCheck, (req, res) => {
   try {
     Banker.findByIdAndUpdate(banker, { rm: relationManager }).then(
       (results) => {
-        res.send("RM has be appointed");
+        res.send("<h2>RM has be appointed</h2>");
       }
     );
 
@@ -320,11 +319,11 @@ router.get("/login", (req, res) => {
 // Get request for admin dashboard page
 router.get("/", authenticateToken, adminCheck, async (req, res) => {
   try {
-    const leads = await Lead.find().populate('banker')
+    const leads = await Lead.find().populate("banker");
     // res.json(leads)
     res.render("Admin/admin", { leads });
   } catch (e) {
-    res.send("PLEASE CONTACT DEVELOPER FOR THIS ERROR");
+    res.send("<h2>PLEASE CONTACT DEVELOPER FOR THIS ERROR</h2>");
   }
 });
 
@@ -438,7 +437,7 @@ router.get("/download", authenticateToken, adminCheck, async (req, res) => {
               serviceName: service.serviceName,
               amount: service.amount,
               payout: service.payout || 0,
-              bankersName: banker.firstName + " " + banker.lastName
+              bankersName: banker.firstName + " " + banker.lastName,
             };
 
             formattedLeads.push(formattedLead);

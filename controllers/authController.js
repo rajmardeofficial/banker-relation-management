@@ -18,28 +18,28 @@ exports.login = (user, modelName, req, res, redirectURL) => {
                 process.env.ACCESS_TOKEN_SECRET,
                 { expiresIn: expirationTimeInSeconds }
               );
-              try {
-                const decodedToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+              // try {
+              //   const decodedToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
 
-                // The decodedToken will contain the payload of the token, including the expiration time
-                console.log('Decoded Token:', decodedToken);
+              //   // The decodedToken will contain the payload of the token, including the expiration time
+              //   console.log('Decoded Token:', decodedToken);
 
-                // Check if the token has expired
-                const isTokenExpired = Date.now() >= decodedToken.exp * 1000; // Multiply by 1000 to convert seconds to milliseconds
-                console.log('Is Token Expired?', isTokenExpired);
+              //   // Check if the token has expired
+              //   const isTokenExpired = Date.now() >= decodedToken.exp * 1000; // Multiply by 1000 to convert seconds to milliseconds
+              //   console.log('Is Token Expired?', isTokenExpired);
 
-                if (isTokenExpired) {
-                  console.log('Token has expired');
-                } else {
-                  console.log('Token is still valid');
-                }
-              } catch (error) {
-                if (error.name === 'TokenExpiredError') {
-                  console.log('Token has expired');
-                } else {
-                  console.log('Token verification failed:', error.message);
-                }
-              }
+              //   if (isTokenExpired) {
+              //     console.log('Token has expired');
+              //   } else {
+              //     console.log('Token is still valid');
+              //   }
+              // } catch (error) {
+              //   if (error.name === 'TokenExpiredError') {
+              //     console.log('Token has expired');
+              //   } else {
+              //     console.log('Token verification failed:', error.message);
+              //   }
+              // }
               res.cookie("jwt", accessToken, {
                 httpOnly: true,
                 secure: true, // Set to true for HTTPS
@@ -48,7 +48,7 @@ exports.login = (user, modelName, req, res, redirectURL) => {
               res.redirect(redirectURL);
             } else {
               console.log("Password incorrect");
-              res.status(401).json({ message: "Incorrect password" });
+              res.status(401).send("<h2>Incorrect Password</h2>");
             }
           } else {
             console.error("Error comparing passwords:", err);
@@ -59,7 +59,7 @@ exports.login = (user, modelName, req, res, redirectURL) => {
         console.log(
           "Cannot find the user with the email. Please check the email you entered"
         );
-        res.status(404).json({ message: "User not found" });
+        res.status(404).send("<h2>User Not Found</h2>");
       }
     } else {
       console.error("Error finding user by email:", err);

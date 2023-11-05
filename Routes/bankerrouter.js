@@ -11,6 +11,7 @@ const xlsx = require("xlsx");
 const authController = require("../controllers/authController");
 const forgotPassword = require("../utils/forgotpassword");
 const mongoose = require("mongoose");
+const { ObjectId } = require('mongodb');
 const RM = require("../model/rmschema");
 const changepassword = require("../utils/changepassword");
 
@@ -36,6 +37,42 @@ function checkApproval(req, res, next) {
       console.error("Error while checking approval:", err);
       res.status(500).send("Internal Server Error");
     });
+}
+
+async function authenticateToken(req, res, next) {
+  const token = req.cookies.jwt;
+  if (!token) {
+    return res.status(401).send("No token found");
+  }
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, banker) => {
+    if (err) {
+      console.log('Token verification failed:', err.message);
+      return res.status(403).send("Token invalid");
+    }
+
+    req.banker = banker;
+    next();
+  });
+}
+
+async function bankerCheck(req, res, next) {
+  if (!req.banker || !req.banker.id) {
+    return res.send("Invalid banker ID");
+  }
+
+  const bankerId = new ObjectId(req.banker.id);
+
+  try {
+    const bankerData = await Banker.findById(bankerId);
+    if (!bankerData) {
+      return res.send("Invalid banker id")
+    }
+    next()
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Internal Server Error")
+  }
 }
 
 // Banker Signup
@@ -93,20 +130,7 @@ router.post("/login", checkApproval, (req, res) => {
 
 // Function to verify JWT Token
 
-function authenticateToken(req, res, next) {
-  const token = req.cookies.jwt;
-  if (!token) {
-    return res.status(401).send("No token found"); // Send a response and return
-  }
 
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, banker) => {
-    if (err) {
-      return res.status(403).send("Token invalid"); // Send a response and return
-    }
-    req.banker = banker;
-    next(); // Call next to continue to the next middleware/route
-  });
-}
 
 //Create Lead
 
@@ -314,13 +338,7 @@ router.post("/createLead", authenticateToken, bankerCheck, async (req, res) => {
 
 // Check if person is banker
 
-function bankerCheck(req, res, next) {
-  Banker.findById(req.banker.id).then((results) => {
-    console.log(results);
-    if (results && results.approval) next();
-    else return res.send("You are not a Banker or You are not approved from ADMIN");
-  });
-}
+
 
 //Create Lead GET request
 router.get("/createLead", authenticateToken, bankerCheck, (req, res) => {
@@ -336,8 +354,8 @@ router.get("/createLead", authenticateToken, bankerCheck, (req, res) => {
 });
 
 //GET for banker dashboard
+
 router.get("/dashboard", authenticateToken, bankerCheck, (req, res) => {
-  console.log(req.banker.id);
   res.render("DashBoard/BankerHomeDashBoard");
 });
 
@@ -357,7 +375,6 @@ router.get(
   authenticateToken,
   bankerCheck,
   async (req, res) => {
-  console.log(req.banker.id);
 
     try {
       const bankerLeads = await Banker.findById(req.banker.id).populate(
@@ -365,7 +382,7 @@ router.get(
       );
 
       console.log(bankerLeads);
-      const leads = bankerLeads.leads.map((lead) => lead);
+      const leads = bankerLeads.leads.map((lead) => lead); ``
 
       res.render("TrackEarning/trackearning", { leads });
     } catch (error) {
@@ -378,6 +395,7 @@ router.get(
 // GET Banker TrackLead Page
 router.get("/tracklead", authenticateToken, bankerCheck, async (req, res) => {
   try {
+    console.log(req.banker.id);
     const bankerLeads = await Banker.findById(req.banker.id).populate(
       "leads"
     );

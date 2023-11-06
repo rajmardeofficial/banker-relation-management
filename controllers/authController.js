@@ -42,9 +42,9 @@ exports.login = (user, modelName, req, res, redirectURL) => {
               //   }
               // }
               res.cookie("jwt", accessToken, {
-                httpOnly: true,
+                // httpOnly: true,
                 secure: true, // Set to true for HTTPS
-                // domain: "bankerspartner.com"
+                domain: "bankerspartner.com"
               });
               res.redirect(redirectURL);
             } else {

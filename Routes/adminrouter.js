@@ -200,11 +200,15 @@ router.post("/updatemanager", adminCheck, checkApproval, (req, res) => {
   try {
     const { firstName, lastName, email, password, rmid } = req.body;
 
+    const saltRounds = 10;
+
+    const hash = bcrypt.hash(password, saltRounds);
+
     const updates = {
       firstName: firstName,
       lastName: lastName,
       email: email,
-      password: password,
+      password: hash,
     };
 
     RM.findByIdAndUpdate(rmid, updates).then((results) => {

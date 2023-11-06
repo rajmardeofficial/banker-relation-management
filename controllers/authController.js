@@ -8,6 +8,7 @@ exports.login = (user, modelName, req, res, redirectURL) => {
   modelName.find({ email }).then((results, err) => {
     if (!err) {
       if (results.length > 0) {
+        // console.log("from login module :"+results);
         bcrypt.compare(password, results[0].password, (err, result) => {
           if (!err) {
             if (result) {
@@ -41,9 +42,9 @@ exports.login = (user, modelName, req, res, redirectURL) => {
               //   }
               // }
               res.cookie("jwt", accessToken, {
-                // httpOnly: true,
+                httpOnly: true,
                 secure: true, // Set to true for HTTPS
-                domain: "bankerspartner.com"
+                // domain: "bankerspartner.com"
               });
               res.redirect(redirectURL);
             } else {

@@ -11,7 +11,7 @@ const xlsx = require("xlsx");
 const authController = require("../controllers/authController");
 const forgotPassword = require("../utils/forgotpassword");
 const mongoose = require("mongoose");
-const { ObjectId } = require('mongodb');
+const { ObjectId } = require("mongodb");
 const RM = require("../model/rmschema");
 const changepassword = require("../utils/changepassword");
 
@@ -47,7 +47,7 @@ async function authenticateToken(req, res, next) {
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, banker) => {
     if (err) {
-      console.log('Token verification failed:', err.message);
+      console.log("Token verification failed:", err.message);
       return res.status(403).send("Token invalid");
     }
 
@@ -62,16 +62,15 @@ async function bankerCheck(req, res, next) {
   }
 
   const bankerId = new ObjectId(req.banker.id);
-
   try {
     const bankerData = await Banker.findById(bankerId);
     if (!bankerData) {
-      return res.send("Invalid banker id")
+      return res.send("Invalid banker id");
     }
-    next()
+    next();
   } catch (err) {
     console.log(err);
-    res.status(500).send("Internal Server Error")
+    res.status(500).send("Internal Server Error");
   }
 }
 
@@ -129,8 +128,6 @@ router.post("/login", checkApproval, (req, res) => {
 });
 
 // Function to verify JWT Token
-
-
 
 //Create Lead
 
@@ -338,8 +335,6 @@ router.post("/createLead", authenticateToken, bankerCheck, async (req, res) => {
 
 // Check if person is banker
 
-
-
 //Create Lead GET request
 router.get("/createLead", authenticateToken, bankerCheck, (req, res) => {
   Service.find().then((result, err) => {
@@ -375,14 +370,14 @@ router.get(
   authenticateToken,
   bankerCheck,
   async (req, res) => {
-
     try {
       const bankerLeads = await Banker.findById(req.banker.id).populate(
         "leads"
       );
 
       console.log(bankerLeads);
-      const leads = bankerLeads.leads.map((lead) => lead); ``
+      const leads = bankerLeads.leads.map((lead) => lead);
+      ``;
 
       res.render("TrackEarning/trackearning", { leads });
     } catch (error) {
@@ -396,9 +391,7 @@ router.get(
 router.get("/tracklead", authenticateToken, bankerCheck, async (req, res) => {
   try {
     console.log(req.banker.id);
-    const bankerLeads = await Banker.findById(req.banker.id).populate(
-      "leads"
-    );
+    const bankerLeads = await Banker.findById(req.banker.id).populate("leads");
     const leads = bankerLeads.leads.map((lead) => lead);
     res.render("TrackLead/tracklead", { leads });
   } catch (error) {
@@ -407,45 +400,50 @@ router.get("/tracklead", authenticateToken, bankerCheck, async (req, res) => {
   }
 });
 
-router.get("/editLead/:id/:serviceId", authenticateToken, bankerCheck, async (req, res) => {
-  try {
-    const id = req.params.id;
-    const serviceId = req.params.serviceId;
+router.get(
+  "/editLead/:id/:serviceId",
+  authenticateToken,
+  bankerCheck,
+  async (req, res) => {
+    try {
+      const id = req.params.id;
+      const serviceId = req.params.serviceId;
 
-    // Find the lead with the specified id
-    const result = await Lead.findById(id);
+      // Find the lead with the specified id
+      const result = await Lead.findById(id);
 
-    if (!result) {
-      return res.status(404).send("Lead not found");
+      if (!result) {
+        return res.status(404).send("Lead not found");
+      }
+
+      // Find the service within the lead's services array based on serviceId
+      const selectedService = result.services.find(
+        (service) => service._id.toString() === serviceId
+      );
+
+      console.log(selectedService);
+
+      if (!selectedService) {
+        return res.status(404).send("Service not found for the specified lead");
+      }
+
+      // Fetch all services from the Service schema
+      const services = await Service.find();
+
+      // Render the EJS view with the specific lead and selected service details
+      res.render("EditLead/editLead", {
+        result,
+        services,
+        selectedService,
+        user: "banker",
+      });
+    } catch (error) {
+      // Handle errors appropriately
+      console.error(error);
+      res.status(500).send("Internal Server Error");
     }
-
-    // Find the service within the lead's services array based on serviceId
-    const selectedService = result.services.find(
-      (service) => service._id.toString() === serviceId
-    );
-
-    console.log(selectedService);
-
-    if (!selectedService) {
-      return res.status(404).send("Service not found for the specified lead");
-    }
-
-    // Fetch all services from the Service schema
-    const services = await Service.find();
-
-    // Render the EJS view with the specific lead and selected service details
-    res.render("EditLead/editLead", {
-      result,
-      services,
-      selectedService,
-      user: "banker",
-    });
-  } catch (error) {
-    // Handle errors appropriately
-    console.error(error);
-    res.status(500).send("Internal Server Error");
   }
-});
+);
 
 // Download excel sheet here
 router.get("/download", authenticateToken, bankerCheck, async (req, res) => {
@@ -513,17 +511,18 @@ router.get("/profile", authenticateToken, bankerCheck, (req, res) => {
 });
 
 //Edit Profile
-router.get('/editProfile', authenticateToken, bankerCheck, async (req, res) => {
-  const id = req.banker.id
-  const banker = await Banker.findById(id)
+router.get("/editProfile", authenticateToken, bankerCheck, async (req, res) => {
+  const id = req.banker.id;
+  const banker = await Banker.findById(id);
   console.log(banker);
-  res.render('EditBankerProfile/editProfile', { banker, id })
-})
+  res.render("EditBankerProfile/editProfile", { banker, id });
+});
 
 //Edit Profile
-router.post('/editProfile/:id', (req, res) => {
-  const id = req.params.id
-  const { firstName, lastName, email, phone, pan, accountNumber, ifsc } = req.body
+router.post("/editProfile/:id", (req, res) => {
+  const id = req.params.id;
+  const { firstName, lastName, email, phone, pan, accountNumber, ifsc } =
+    req.body;
   console.log(req.body);
   const update = {
     firstName,
@@ -531,9 +530,11 @@ router.post('/editProfile/:id', (req, res) => {
     email,
     phone,
     pan,
-    'bankDetails.accountNumber': accountNumber,
-    ifsc
-  }
-  Banker.findByIdAndUpdate(id, update).then(result => res.redirect('/banker/profile'))
-})
+    "bankDetails.accountNumber": accountNumber,
+    ifsc,
+  };
+  Banker.findByIdAndUpdate(id, update).then((result) =>
+    res.redirect("/banker/profile")
+  );
+});
 module.exports = router;

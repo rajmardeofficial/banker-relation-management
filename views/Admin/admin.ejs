@@ -117,7 +117,7 @@
       Bankers Partner
     </a>
 
-    
+
 
     <ul class="navbar-nav flex-row d-md-none">
       <li class="nav-item text-nowrap">
@@ -163,14 +163,15 @@
             <table class="table table-striped table-sm">
               <thead>
                 <tr>
-                  <th scope="col">Lead Id</th>
-                  <th scope="col">Customer Name</th>
                   <th scope="col">Date</th>
-                  <th scope="col">Lead Status</th>
+                  <th scope="col">Customer Name</th>
                   <th scope="col">Mobile</th>
-                  <th scope="col">Remark</th>
                   <th scope="col">Service</th>
+                  <th scope="col">Remark</th>
+                  <th scope="col">Lead Status</th>
+                  <th scope="col">Lead Id</th>
                   <th scope="col">Banker</th>
+                  <th scope="col">Relation Manager</th>
                 </tr>
               </thead>
               <tbody>
@@ -187,23 +188,28 @@
                           <% lead.services.slice().reverse().forEach(function (service) { %>
                             <% if(service.isActive){ %>
                 <tr>
-                  <td>
-                    <%= lead.leadId %>
-                  </td>
-
-                  <% const name=lead.firstName + " " + lead.lastName %>
-                    <td><span class="cell-label"></span>
-                      <%= name %>
-                    </td>
-
-                    <% const date=new Date(lead.generationDate); %>
-                      <% const day=date.getDate().toString().padStart(2, '0' ); %>
-                        <% const month=(date.getMonth() + 1).toString().padStart(2, '0' ); %>
-                          <% const year=date.getFullYear().toString().substr(-2); %>
-                            <td>
-                              <%= `${day}/${month}/${year}` %>
+                  <% const date=new Date(lead.generationDate); %>
+                    <% const day=date.getDate().toString().padStart(2, '0' ); %>
+                      <% const month=(date.getMonth() + 1).toString().padStart(2, '0' ); %>
+                        <% const year=date.getFullYear().toString().substr(-2); %>
+                          <td>
+                            <%= `${day}/${month}/${year}` %>
+                          </td>
+                          <% const name=lead.firstName + " " + lead.lastName %>
+                            <td><span class="cell-label"></span>
+                              <%= name %>
                             </td>
-
+                            <td><span class="cell-label"></span>
+                              <%= lead.phone %>
+                            </td>
+                            <td>
+                              <span class="cell-label"></span>
+                              <%= service.serviceName %>
+                            </td>
+                            <td>
+                              <span class="cell-label"></span>
+                              <%= service.remark %>
+                            </td>
                             <td>
                               <span class="cell-label"></span>
                               <% const status=service.status %>
@@ -212,24 +218,26 @@
                                   <%= status.toUpperCase() %>
                                 </span>
                             </td>
-                            <td><span class="cell-label"></span>
-                              <%= lead.phone %>
-                            </td>
                             <td>
-                              <span class="cell-label"></span>
-                              <%= service.remark %>
-                            </td>
-                            <td>
-                              <span class="cell-label"></span>
-                              <%= service.serviceName %>
+                              <%= lead.leadId %>
                             </td>
                             <td>
                               <span class="cell-label"></span>
                               <% if (lead.banker) { %>
-                                <%= lead.banker.firstName %> <%= lead.banker.lastName %>
-                              <% } else { %>
-                                <p>No Leads if you think its present contact developer to fix this issue</p>
-                              <% } %>
+                                <%= lead.banker.firstName %>
+                                  <%= lead.banker.lastName %>
+                                    <% } else { %>
+                                      <p>No Leads if you think its present contact developer to fix this issue</p>
+                                      <% } %>
+                            </td>
+                            <td>
+                              <span class="cell-label"></span>
+                              <% if (lead.banker.rm) { %>
+                                <%= lead.banker.rm.firstName %>
+                                  <%= lead.banker.rm.lastName %>
+                                    <% } else { %>
+                                      <p>No Leads if you think its present contact developer to fix this issue</p>
+                                      <% } %>
                             </td>
 
                 </tr>
@@ -275,29 +283,29 @@
     }
 
     function filterLeads(status) {
-    let input = document.getElementById('searchbar').value.toLowerCase();
-    let table = document.querySelector('.table tbody');
-    let rows = table.getElementsByTagName('tr');
+      let input = document.getElementById('searchbar').value.toLowerCase();
+      let table = document.querySelector('.table tbody');
+      let rows = table.getElementsByTagName('tr');
 
-    for (let i = 0; i < rows.length; i++) {
-      let cells = rows[i].getElementsByTagName('td');
-      let found = false;
+      for (let i = 0; i < rows.length; i++) {
+        let cells = rows[i].getElementsByTagName('td');
+        let found = false;
 
-      for (let j = 0; j < cells.length; j++) {
-        if (cells[j].innerHTML.toLowerCase().includes(input)) {
-          found = true;
-          break;
+        for (let j = 0; j < cells.length; j++) {
+          if (cells[j].innerHTML.toLowerCase().includes(input)) {
+            found = true;
+            break;
+          }
+        }
+
+        // Check if the status filter matches
+        if (found && (status === 'All' || cells[3].innerText.toLowerCase().includes(status.toLowerCase()))) {
+          rows[i].style.display = "";
+        } else {
+          rows[i].style.display = "none";
         }
       }
-
-      // Check if the status filter matches
-      if (found && (status === 'All' || cells[3].innerText.toLowerCase().includes(status.toLowerCase()))) {
-        rows[i].style.display = "";
-      } else {
-        rows[i].style.display = "none";
-      }
     }
-  }
   </script>
 </body>
 

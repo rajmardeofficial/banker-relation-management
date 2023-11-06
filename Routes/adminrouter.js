@@ -8,6 +8,7 @@ const RM = require("../model/rmschema");
 const Service = require("../model/serviceschema");
 const forgotPassword = require("../utils/forgotpassword");
 const changepassword = require("../utils/changepassword");
+const { ObjectId } = require("mongodb");
 const { login, signup } = require("../controllers/authController");
 const Banker = require("../model/bankerschema");
 const Lead = require("../model/leadschema");
@@ -15,11 +16,26 @@ const xlsx = require("xlsx");
 
 // Check if person is admin
 
-function adminCheck(req, res, next) {
-  Admin.findById(req.admin.id).then((results) => {
-    if (results) next();
-    else return res.send("You are not a admin");
-  });
+async function adminCheck(req, res, next) {
+  // console.log('req.admin=', req.admin)
+  const adminId = new ObjectId(req.admin.id);
+  // Admin.findById(req.admin.id).then((results) => {
+  //   console.log(results);
+
+  //   if (results) next();
+  //   else return res.send("You are not a admin");
+  // });
+
+  try {
+    const adminData = await Admin.findById(adminId);
+    if (!adminData) {
+      return res.send("Invalid Admin id");
+    }
+    next();
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Internal Server Error");
+  }
 }
 
 //Check for approval function
@@ -138,22 +154,34 @@ router.post("/login", checkApproval, (req, res) => {
 
 // Function to verify JWT Token
 
-function authenticateToken(req, res, next) {
+async function authenticateToken(req, res, next) {
   const token = req.cookies.jwt;
+
+  // console.log('token=', req.cookies)
 
   if (!token) {
     return res.status(401).send("No token found");
   }
 
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, admin) => {
-    if (err) {
-      console.log("Token verification failed:", err.message);
-      return res.status(403).send("Token invalid");
-    }
+  // jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, admin) => {
+  //   if (err) {
+  //     console.log("Token verification failed:", err.message);
+  //     return res.status(403).send("Token invalid");
+  //   }
 
-    req.admin = admin;
+  //   req.admin = admin;
+  //   next();
+  // });
+
+  try {
+    const jwtVerify = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    // console.log("verified :" + JSON.stringify(jwtVerify));
+    req.admin = jwtVerify;
     next();
-  });
+  } catch (e) {
+    console.log(e);
+    res.send("Some error occured");
+  }
 }
 
 // Signup
@@ -319,7 +347,13 @@ router.get("/login", (req, res) => {
 // Get request for admin dashboard page
 router.get("/", authenticateToken, adminCheck, async (req, res) => {
   try {
-    const leads = await Lead.find().populate("banker");
+    const leads = await Lead.find().populate({
+      path: "banker",
+      populate: {
+        path: "rm", // Populate the RM field in the Banker schema
+        model: "RelationManager",
+      },
+    });
     // res.json(leads)
     res.render("Admin/admin", { leads });
   } catch (e) {

@@ -157,7 +157,7 @@ router.post("/login", checkApproval, (req, res) => {
 async function authenticateToken(req, res, next) {
   const token = req.cookies.jwt;
 
-  // console.log('token=', req.cookies)
+  console.log('token=', req.cookies)
 
   if (!token) {
     return res.status(401).send("No token found");

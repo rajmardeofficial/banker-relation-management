@@ -14,29 +14,6 @@ const Banker = require("../model/bankerschema");
 const Lead = require("../model/leadschema");
 const xlsx = require("xlsx");
 
-// Check if person is admin
-
-async function adminCheck(req, res, next) {
-  // console.log('req.admin=', req.admin)
-  const adminId = new ObjectId(req.admin.id);
-  // Admin.findById(req.admin.id).then((results) => {
-  //   console.log(results);
-
-  //   if (results) next();
-  //   else return res.send("You are not a admin");
-  // });
-
-  try {
-    const adminData = await Admin.findById(adminId);
-    if (!adminData) {
-      return res.send("Invalid Admin id");
-    }
-    next();
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Internal Server Error");
-  }
-}
 
 //Check for approval function
 function checkApproval(req, res, next) {
@@ -62,102 +39,10 @@ function checkApproval(req, res, next) {
     });
 }
 
-// POST route to handle admin approval
-router.post(
-  "/approveAdmin",
-  authenticateToken,
-  adminCheck,
-  async (req, res) => {
-    const { adminId, action } = req.body;
-
-    try {
-      // Find the admin by ID
-      const admin = await Admin.findById(adminId);
-
-      if (!admin) {
-        return res.status(404).json({ error: "Admin not found" });
-      }
-
-      // Update the approval status based on the action
-      if (action === "approve") {
-        admin.approval = true;
-      } else if (action === "reject") {
-        // Optionally handle rejection logic, e.g., remove the admin from the database
-        await Admin.findByIdAndDelete(adminId);
-        return res.json({ message: "Admin rejected and removed" });
-      } else {
-        return res.status(400).json({ error: "Invalid action" });
-      }
-
-      // Save the changes
-      await admin.save();
-
-      // Respond with a success message
-      res.json({ message: "Action successful", admin });
-    } catch (error) {
-      console.error("Error:", error);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
-  }
-);
-
-// POST route to handle banker approval
-router.post(
-  "/approveBanker",
-  authenticateToken,
-  adminCheck,
-  async (req, res) => {
-    const { bankerId, action } = req.body;
-
-    try {
-      // Find the admin by ID
-      const banker = await Banker.findById(bankerId);
-
-      if (!banker) {
-        return res.status(404).json({ error: "Banker not found" });
-      }
-
-      // Update the approval status based on the action
-      if (action === "approve") {
-        banker.approval = true;
-      } else if (action === "reject") {
-        // Optionally handle rejection logic, e.g., remove the banker from the database
-        await Admin.findByIdAndDelete(bankerId);
-        return res.json({ message: "Banker rejected and removed" });
-      } else {
-        return res.status(400).json({ error: "Invalid action" });
-      }
-
-      // Save the changes
-      await banker.save();
-
-      // Respond with a success message
-      res.json({ message: "Action successful", banker });
-    } catch (error) {
-      console.error("Error:", error);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
-  }
-);
-
-//Admin Signup Post Request
-router.post("/signup", (req, res) => {
-  signup(Admin, req, res);
-});
-
-// Admin Login post request
-
-router.post("/login", checkApproval, (req, res) => {
-  let admin;
-  login(admin, Admin, req, res, "/admin");
-});
-
-// Function to verify JWT Token
-
 async function authenticateToken(req, res, next) {
   const token = req.cookies.jwt;
 
-  // console.log('token=', req.cookies)
+  console.log('token=', req.cookies)
 
   if (!token) {
     return res.status(401).send("No token found");
@@ -168,10 +53,129 @@ async function authenticateToken(req, res, next) {
       console.log("Token verification failed:", err.message);
       return res.status(403).send("Token invalid");
     }
-
     req.admin = admin;
     next();
   });
+
+  // Check if person is admin
+
+  async function adminCheck(req, res, next) {
+    // console.log('req.admin=', req.admin)
+    const adminId = new ObjectId(req.admin.id);
+    // Admin.findById(req.admin.id).then((results) => {
+    //   console.log(results);
+
+    //   if (results) next();
+    //   else return res.send("You are not a admin");
+    // });
+
+    try {
+      const adminData = await Admin.findById(adminId);
+      if (!adminData) {
+        return res.send("Invalid Admin id");
+      }
+      next();
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("Internal Server Error");
+    }
+  }
+
+
+
+  // POST route to handle admin approval
+  router.post(
+    "/approveAdmin",
+    authenticateToken,
+    adminCheck,
+    async (req, res) => {
+      const { adminId, action } = req.body;
+
+      try {
+        // Find the admin by ID
+        const admin = await Admin.findById(adminId);
+
+        if (!admin) {
+          return res.status(404).json({ error: "Admin not found" });
+        }
+
+        // Update the approval status based on the action
+        if (action === "approve") {
+          admin.approval = true;
+        } else if (action === "reject") {
+          // Optionally handle rejection logic, e.g., remove the admin from the database
+          await Admin.findByIdAndDelete(adminId);
+          return res.json({ message: "Admin rejected and removed" });
+        } else {
+          return res.status(400).json({ error: "Invalid action" });
+        }
+
+        // Save the changes
+        await admin.save();
+
+        // Respond with a success message
+        res.json({ message: "Action successful", admin });
+      } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+    }
+  );
+
+  // POST route to handle banker approval
+  router.post(
+    "/approveBanker",
+    authenticateToken,
+    adminCheck,
+    async (req, res) => {
+      const { bankerId, action } = req.body;
+
+      try {
+        // Find the admin by ID
+        const banker = await Banker.findById(bankerId);
+
+        if (!banker) {
+          return res.status(404).json({ error: "Banker not found" });
+        }
+
+        // Update the approval status based on the action
+        if (action === "approve") {
+          banker.approval = true;
+        } else if (action === "reject") {
+          // Optionally handle rejection logic, e.g., remove the banker from the database
+          await Admin.findByIdAndDelete(bankerId);
+          return res.json({ message: "Banker rejected and removed" });
+        } else {
+          return res.status(400).json({ error: "Invalid action" });
+        }
+
+        // Save the changes
+        await banker.save();
+
+        // Respond with a success message
+        res.json({ message: "Action successful", banker });
+      } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+    }
+  );
+
+  //Admin Signup Post Request
+  router.post("/signup", (req, res) => {
+    signup(Admin, req, res);
+  });
+
+  // Admin Login post request
+
+  router.post("/login", checkApproval, (req, res) => {
+    let admin;
+    login(admin, Admin, req, res, "/admin");
+  });
+
+  // Function to verify JWT Token
+
+
 
   // try {
   //   const jwtVerify = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);

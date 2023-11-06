@@ -1,86 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Track Lead</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
-      crossorigin="anonymous"
-    />
-    <link rel="stylesheet" href="/TrackEarning/trackearning.css" />
-  </head>
-  <body>
-    <div class="app-container">
-      <div class="app-content">
-        <div class="app-content-header">
-          <h1 class="app-content-headerText">Track Lead</h1>
-          <div class="button-container">
-            <div class="dropdown">
-              <button class="dropbtn">Filter</button>
-              <div class="dropdown-content">
-                <a href="#" data-value="all">All</a>
-                <a href="#" data-value="completed">Completed</a>
-                <a href="#" data-value="cancel">Cancel</a>
-                <a href="#" data-value="pending">Pending</a>
-              </div>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Track Lead</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" />
+  <link rel="stylesheet" href="/TrackEarning/trackearning.css" />
+</head>
+
+<body>
+  <div class="app-container">
+    <div class="app-content">
+      <div class="app-content-header">
+        <h1 class="app-content-headerText">Track Lead</h1>
+        <div class="button-container">
+          <div class="dropdown">
+            <button class="dropbtn">Filter</button>
+            <div class="dropdown-content">
+              <a href="#" data-value="all">All</a>
+              <a href="#" data-value="completed">Completed</a>
+              <a href="#" data-value="cancel">Cancel</a>
+              <a href="#" data-value="pending">Pending</a>
             </div>
-            <a
-              style="
+          </div>
+          <a style="
                 text-decoration: none;
                 color: white;
                 background-color: red;
                 padding: 10px;
                 border-radius: 10px;
-              "
-              href="/banker/logout"
-              >Logout</a
-            >
-          </div>
+              " href="/banker/logout">Logout</a>
         </div>
-        <div class="search-bar-container">
-          <input
-            type="text"
-            class="search-bar"
-            placeholder="Search..."
-            id="searchInput"
-          />
-        </div>
+      </div>
+      <div class="search-bar-container">
+        <input type="text" class="search-bar" placeholder="Search..." id="searchInput" />
+      </div>
 
-        <div class="action-btns" style="display: inline">
-          <button class="btn btn-primary" style="">
-            <a style="color: white; text-decoration: none" href="/rm/createLead"
-              >Create Lead</a
-            >
-          </button>
-          <button class="btn btn-secondary" onclick="location.reload();">
-            Refresh Page
-          </button>
-        </div>
+      <div class="action-btns" style="display: inline">
+        <button class="btn btn-primary" style="">
+          <a style="color: white; text-decoration: none" href="/rm/createLead">Create Lead</a>
+        </button>
 
-        <!-- Table starts here -->
-        <table class="tableView">
-          <thead>
-            <tr>
-              <th>Lead ID</th>
-              <th>Lead Generation Date</th>
-              <th>Lead Status</th>
-              <th>Mobile</th>
-              <th>Service</th>
-              <th>Remarks</th>
-              <th>Customer Name</th>
-              <th>Options</th>
-              <th>Banker</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% if (!result || !result[0].bankers || result[0].bankers.length ===
-            0) { %>
+        <button class="btn btn-secondary" onclick="location.reload();">
+          Refresh Page
+        </button>
+      </div>
+
+
+      <!-- Table starts here -->
+      <table class="tableView">
+        <thead>
+          <tr>
+            <th>Lead ID</th>
+            <th>Lead Generation Date</th>
+            <th>Lead Status</th>
+            <th>Mobile</th>
+            <th>Service</th>
+            <th>Remarks</th>
+            <th>Customer Name</th>
+            <th>Options</th>
+            <th>Banker</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!result || !result[0].bankers || result[0].bankers.length===0) { %>
             <tr>
               <td colspan="9">
                 <h3 style="color: red">No Leads To Show</h3>
@@ -90,53 +75,66 @@
                 </p>
               </td>
             </tr>
-            <% } else { %> <% result[0].bankers.slice().reverse().forEach(function(banker) { %> <%
-            banker.leads.slice().reverse().forEach(function(lead) { %> <%
-            lead.services.slice().reverse().forEach(function(service) { %> <% if
-            (service.isActive) { %>
-            <tr>
-              <td><%= lead.leadId %></td>
-              <% const date=new Date(lead.generationDate); %> <% const
-              day=date.getDate().toString().padStart(2, '0' ); %> <% const
-              month=(date.getMonth() + 1).toString().padStart(2, '0' ); %> <%
-              const year=date.getFullYear().toString().substr(-2); %>
-              <td><%= `${day}/${month}/${year}` %></td>
-              <td>
-                <span class="cell-label">Status:</span>
-                <% const status = service.status %>
-                <span
-                  class="status <%= status.toLowerCase() === 'completed' ? 'status-paid' : 'status-due' %>"
-                >
-                  <%= status.toUpperCase() %>
-                </span>
-              </td>
-              <td><span class="cell-label">Amount:</span><%= lead.phone %></td>
-              <td>
-                <span class="cell-label">Service:</span><%= service.serviceName
-                %>
-              </td>
-              <td>
-                <span class="cell-label">Remarks:</span><%= service.remark %>
-              </td>
-              <% const name = lead.firstName + " " + lead.lastName %>
-              <td><span class="cell-label">Name:</span><%= name %></td>
-              <td>
-                <span class="cell-label">Bonus Amount:</span>
-                <a href="/rm/editLead/<%= lead._id %>/<%= service._id %>"
-                  >View/Edit</a
-                >
-              </td>
-              <td>
-                <!-- Assuming each lead has one banker, modify accordingly if it's different -->
-                <%= banker.firstName %> <%= banker.lastName %>
-              </td>
-            </tr>
-            <% } %> <% }); %> <% }); %> <% }); %> <% } %>
-          </tbody>
-        </table>
-        <!-- Table ends here -->
-      </div>
+            <% } else { %>
+              <% result[0].bankers.slice().reverse().forEach(function(banker) { %>
+                <% banker.leads.slice().reverse().forEach(function(lead) { %>
+                  <% lead.services.forEach(function(service) { %>
+                    <% if (service.isActive) { %>
+                      <tr>
+                        <td>
+                          <%= lead.leadId %>
+                        </td>
+                        <% const date=new Date(lead.generationDate); %>
+                          <% const day=date.getDate().toString().padStart(2, '0' ); %>
+                            <% const month=(date.getMonth() + 1).toString().padStart(2, '0' ); %>
+                              <% const year=date.getFullYear().toString().substr(-2); %>
+                                <td>
+                                  <%= `${day}/${month}/${year}` %>
+                                </td>
+                                <td>
+                                  <span class="cell-label">Status:</span>
+                                  <% const status=service.status %>
+                                    <span
+                                      class="status <%= status.toLowerCase() === 'completed' ? 'status-paid' : 'status-due' %>">
+                                      <%= status.toUpperCase() %>
+                                    </span>
+                                </td>
+                                <td><span class="cell-label">Amount:</span>
+                                  <%= lead.phone %>
+                                </td>
+                                <td>
+                                  <span class="cell-label">Service:</span>
+                                  <%= service.serviceName %>
+                                </td>
+                                <td>
+                                  <span class="cell-label">Remarks:</span>
+                                  <%= service.remark %>
+                                </td>
+                                <% const name=lead.firstName + " " + lead.lastName %>
+                                  <td><span class="cell-label">Name:</span>
+                                    <%= name %>
+                                  </td>
+                                  <td>
+                                    <span class="cell-label">Bonus Amount:</span>
+                                    <a href="/rm/editLead/<%= lead._id %>/<%= service._id %>">View/Edit</a>
+                                  </td>
+                                  <td>
+                                    <!-- Assuming each lead has one banker, modify accordingly if it's different -->
+                                    <%= banker.firstName %>
+                                      <%= banker.lastName %>
+                                  </td>
+                      </tr>
+                      <% } %>
+                        <% }); %>
+                          <% }); %>
+                            <% }); %>
+                              <% } %>
+        </tbody>
+      </table>
+      <!-- Table ends here -->
     </div>
-    <script src="/TrackEarning/trackearning.js"></script>
-  </body>
+  </div>
+  <script src="/TrackEarning/trackearning.js"></script>
+</body>
+
 </html>

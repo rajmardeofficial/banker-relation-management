@@ -153,7 +153,7 @@ router.post("/createLead", rmCheck,  async (req, res) => {
       services: updatedServices,
       payoutAmount,
       createdby: "rm",
-      banker: bankerId
+      banker: bankersId
       // Add other lead properties as needed
     });
 
@@ -308,7 +308,6 @@ router.get("/trackLead",  rmCheck, async (req, res) => {
 
     const result = await RM.aggregate([
       { $match: { _id: rmObjectId } },
-      // { $match: { _id: ObjectId("6543fa6b9c27f8f4d6e25025") } },
       {
         $lookup: {
           from: "bankers",
@@ -330,7 +329,6 @@ router.get("/trackLead",  rmCheck, async (req, res) => {
           _id: 1,
           firstName: 1,
           lastName: 1,
-          // Add other fields from the relation manager if needed
           bankers: {
             $map: {
               input: "$bankers",
@@ -339,8 +337,15 @@ router.get("/trackLead",  rmCheck, async (req, res) => {
                 _id: "$$banker._id",
                 firstName: "$$banker.firstName",
                 lastName: "$$banker.lastName",
-                // Add other fields from the banker if needed
-                leads: "$leads"
+                leads: {
+                  $filter: {
+                    input: "$leads",
+                    as: "lead",
+                    cond: {
+                      $in: ["$$lead._id", "$$banker.leads"]
+                    }
+                  }
+                }
               }
             }
           }

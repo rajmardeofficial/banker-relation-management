@@ -202,18 +202,21 @@ router.post("/updatemanager", adminCheck, checkApproval, (req, res) => {
 
     const saltRounds = 10;
 
-    const hash = bcrypt.hash(password, saltRounds);
+    bcrypt.hash(password, saltRounds).then((hash) => {
 
-    const updates = {
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      password: hash,
-    };
+      const updates = {
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        password: hash,
+      };
 
-    RM.findByIdAndUpdate(rmid, updates).then((results) => {
-      res.redirect("/admin");
-    });
+      RM.findByIdAndUpdate(rmid, updates).then((results) => {
+        res.redirect("/admin");
+      });
+    })
+
+
   } catch (e) {
     res.send("Some error occured :" + e);
   }

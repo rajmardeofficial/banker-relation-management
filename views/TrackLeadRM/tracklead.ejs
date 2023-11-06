@@ -90,9 +90,9 @@
                 </p>
               </td>
             </tr>
-            <% } else { %> <% result[0].bankers.forEach(function(banker) { %> <%
+            <% } else { %> <% result[0].bankers.slice().reverse().forEach(function(banker) { %> <%
             banker.leads.slice().reverse().forEach(function(lead) { %> <%
-            lead.services.forEach(function(service) { %> <% if
+            lead.services.slice().reverse().forEach(function(service) { %> <% if
             (service.isActive) { %>
             <tr>
               <td><%= lead.leadId %></td>

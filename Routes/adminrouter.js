@@ -9,64 +9,63 @@ const Service = require("../model/serviceschema");
 const forgotPassword = require("../utils/forgotpassword");
 const changepassword = require("../utils/changepassword");
 const { ObjectId } = require("mongodb");
-const { login, signup } = require("../controllers/authController");
+const { login, signup, setupSession } = require("../controllers/authController");
 const Banker = require("../model/bankerschema");
 const Lead = require("../model/leadschema");
 const xlsx = require("xlsx");
+const session = require('express-session')
 
 // Check if person is admin
 
-async function adminCheck(req, res, next) {
-  // console.log('req.admin=', req.admin)
-  const adminId = new ObjectId(req.admin.id);
-  // Admin.findById(req.admin.id).then((results) => {
-  //   console.log(results);
+function adminCheck(req, res, next) {
+  const user = req.session.user;
 
-  //   if (results) next();
-  //   else return res.send("You are not a admin");
-  // });
+  // console.log(user);
+
+  if (!user) {
+    return res.status(403).send("Unauthorized: User not logged in");
+  }
 
   try {
-    const adminData = await Admin.findById(adminId);
-    if (!adminData) {
-      return res.send("Invalid Admin id");
-    }
-    next();
-  } catch (err) {
-    console.log(err);
+    Admin.findById(user.id).then((result, err) => {
+      if (result) {
+        // User is an admin, proceed to the next middleware
+        // console.log("from admincheck " + result);
+        next();
+      } else {
+        // User is not an admin, send a 403 Forbidden response
+        res.status(403).send("You are not an admin");
+      }
+    })
+  } catch (e) {
+    console.error("Error checking admin status:", e);
     res.status(500).send("Internal Server Error");
   }
 }
 
 //Check for approval function
 function checkApproval(req, res, next) {
-  const { email } = req.body;
+  const email = req.session.user.email;
 
-  Admin.find({ email })
-    .then((result) => {
-      if (result && result.length > 0) {
-        if (result[0].approval) {
-          next();
-        } else {
-          res.send(
-            "You are not approved as admin; please wait for the approval"
-          );
-        }
+  console.log(email);
+
+  try {
+    Admin.findOne({ email }).then((result) => {
+      if (result && result.approval) {
+        next();
       } else {
-        res.status(404).send("Admin not found");
+        res.status(403).send("You are not approved as admin; please wait for approval");
       }
     })
-    .catch((err) => {
-      console.error("Error while checking approval:", err);
-      res.status(500).send("Internal Server Error");
-    });
+  } catch (err) {
+    console.error("Error while checking approval:", err);
+    res.status(500).send("Internal Server Error");
+  }
 }
-
 // POST route to handle admin approval
 router.post(
   "/approveAdmin",
-  authenticateToken,
-  adminCheck,
+  adminCheck, checkApproval,
   async (req, res) => {
     const { adminId, action } = req.body;
 
@@ -104,8 +103,7 @@ router.post(
 // POST route to handle banker approval
 router.post(
   "/approveBanker",
-  authenticateToken,
-  adminCheck,
+  adminCheck, checkApproval,
   async (req, res) => {
     const { bankerId, action } = req.body;
 
@@ -147,42 +145,9 @@ router.post("/signup", (req, res) => {
 
 // Admin Login post request
 
-router.post("/login", checkApproval, (req, res) => {
-  let admin;
-  login(admin, Admin, req, res, "/admin");
+router.post("/login", (req, res) => {
+  login(Admin, req, res, "/admin");
 });
-
-// Function to verify JWT Token
-
-async function authenticateToken(req, res, next) {
-  const token = req.cookies.jwt;
-
-  console.log('token=', req.cookies)
-
-  if (!token) {
-    return res.status(401).send("No token found");
-  }
-
-  // jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, admin) => {
-  //   if (err) {
-  //     console.log("Token verification failed:", err.message);
-  //     return res.status(403).send("Token invalid");
-  //   }
-
-  //   req.admin = admin;
-  //   next();
-  // });
-
-  try {
-    const jwtVerify = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    // console.log("verified :" + JSON.stringify(jwtVerify));
-    req.admin = jwtVerify;
-    next();
-  } catch (e) {
-    console.log(e);
-    res.send("Some error occured");
-  }
-}
 
 // Signup
 
@@ -192,7 +157,7 @@ router.get("/signup", (req, res) => {
 
 // Add relationship manager
 
-router.post("/addrm", authenticateToken, adminCheck, async (req, res) => {
+router.post("/addrm", adminCheck, checkApproval, async (req, res) => {
   const { fname, lname, phone, email, password } = req.body;
   const saltRounds = 10;
 
@@ -231,7 +196,7 @@ router.post("/addrm", authenticateToken, adminCheck, async (req, res) => {
 
 // Update relationship manager
 
-router.post("/updatemanager", authenticateToken, adminCheck, (req, res) => {
+router.post("/updatemanager", adminCheck, checkApproval, (req, res) => {
   try {
     const { firstName, lastName, email, password, rmid } = req.body;
 
@@ -252,7 +217,7 @@ router.post("/updatemanager", authenticateToken, adminCheck, (req, res) => {
 
 // Admin can add services
 
-router.post("/addservice", authenticateToken, adminCheck, (req, res) => {
+router.post("/addservice", adminCheck, checkApproval, (req, res) => {
   const { serviceName, standardFees } = req.body;
   const service = new Service();
   service.serviceName = serviceName;
@@ -282,7 +247,7 @@ router.post("/addservice", authenticateToken, adminCheck, (req, res) => {
 
 //Update the services
 
-router.post("/updateservice", authenticateToken, adminCheck, (req, res) => {
+router.post("/updateservice", adminCheck, checkApproval, (req, res) => {
   const { serviceId, updatedServiceName, standardFees } = req.body;
 
   const updates = {
@@ -310,12 +275,12 @@ router.post("/forgotpassword", (req, res) => {
 });
 
 // Change password Admin
-router.post("/changePassword", authenticateToken, adminCheck, (req, res) => {
-  changepassword(Admin, req, res, req.admin.id);
+router.post("/changePassword", adminCheck, checkApproval, (req, res) => {
+  changepassword(Admin, req, res, req.session.user.id);
 });
 
 //Update RM for Banker and vice versa
-router.post("/appointRm", authenticateToken, adminCheck, (req, res) => {
+router.post("/appointRm", adminCheck, checkApproval, (req, res) => {
   const { relationManager, banker } = req.body;
   try {
     Banker.findByIdAndUpdate(banker, { rm: relationManager }).then(
@@ -345,7 +310,7 @@ router.get("/login", (req, res) => {
 });
 
 // Get request for admin dashboard page
-router.get("/", authenticateToken, adminCheck, async (req, res) => {
+router.get("/", adminCheck, checkApproval, async (req, res) => {
   try {
     const leads = await Lead.find().populate({
       path: "banker",
@@ -354,7 +319,7 @@ router.get("/", authenticateToken, adminCheck, async (req, res) => {
         model: "RelationManager",
       },
     });
-    res.json(leads)
+    // res.json(leads)
     res.render("Admin/admin", { leads });
   } catch (e) {
     res.send("<h2>PLEASE CONTACT DEVELOPER FOR THIS ERROR</h2>");
@@ -362,19 +327,19 @@ router.get("/", authenticateToken, adminCheck, async (req, res) => {
 });
 
 //Get req for add rm
-router.get("/addrm", authenticateToken, adminCheck, (req, res) => {
+router.get("/addrm", adminCheck, checkApproval, (req, res) => {
   res.render("AddRelationship/addrelationship");
 });
 
 //Get req for update rm
-router.get("/updateRm", authenticateToken, adminCheck, (req, res) => {
+router.get("/updateRm", adminCheck, checkApproval, (req, res) => {
   RM.find().then((rm) =>
     res.render("UpdateRelationship/updaterelationship", { rm })
   );
 });
 
 //Get req to Appoint rm
-router.get("/appointRm", authenticateToken, adminCheck, (req, res) => {
+router.get("/appointRm", adminCheck, checkApproval, (req, res) => {
   try {
     RM.find().then((rm) => {
       Banker.find().then((bankers) => {
@@ -387,7 +352,7 @@ router.get("/appointRm", authenticateToken, adminCheck, (req, res) => {
 });
 
 //Get req to Approve Admin request
-router.get("/approveAdminReq", authenticateToken, adminCheck, (req, res) => {
+router.get("/approveAdminReq", adminCheck, checkApproval, (req, res) => {
   try {
     Admin.find({ approval: false }).then((admins) => {
       res.render("ApproveAdminRequest/approveadminrequest", { admins });
@@ -398,7 +363,7 @@ router.get("/approveAdminReq", authenticateToken, adminCheck, (req, res) => {
 });
 
 //Get req to Approve Banker request
-router.get("/approveBanker", authenticateToken, adminCheck, (req, res) => {
+router.get("/approveBanker", adminCheck, checkApproval, (req, res) => {
   try {
     Banker.find({ approval: false }).then((bankers) => {
       res.render("ApproveBanker/approveBanker", { bankers });
@@ -409,27 +374,27 @@ router.get("/approveBanker", authenticateToken, adminCheck, (req, res) => {
 });
 
 //Get req to add services
-router.get("/addServices", authenticateToken, adminCheck, (req, res) => {
+router.get("/addServices", adminCheck, (req, res) => {
   res.render("AddServices/addservice");
 });
 
 //Get req to update service
-router.get("/updateService", authenticateToken, adminCheck, (req, res) => {
+router.get("/updateService", adminCheck, (req, res) => {
   Service.find().then((services) => {
     res.render("UpdateService/updateservice", { services });
   });
 });
 
 //Get req to update service
-router.get("/changePassword", authenticateToken, adminCheck, (req, res) => {
+router.get("/changePassword", adminCheck, checkApproval, (req, res) => {
   res.render("ChangePassword/changepassword");
 });
 
 // See Associated banker
 router.get(
   "/appointedBankers",
-  authenticateToken,
-  adminCheck,
+
+  adminCheck, checkApproval,
   async (req, res) => {
     try {
       const bankers = await Banker.find().populate("rm");
@@ -443,7 +408,7 @@ router.get(
 
 // Download excel sheet here
 
-router.get("/download", authenticateToken, adminCheck, async (req, res) => {
+router.get("/download", adminCheck, checkApproval, async (req, res) => {
   try {
     // Fetch all bankers and populate the 'leads.lead' field to get associated leads
     const bankers = await Banker.find().populate("leads");
@@ -500,7 +465,7 @@ router.get("/download", authenticateToken, adminCheck, async (req, res) => {
   }
 });
 // Download Excel Sheet of banker details
-router.get("/downloadBankerDetails", async (req, res) => {
+router.get("/downloadBankerDetails", adminCheck, checkApproval, async (req, res) => {
   try {
     const bankers = await Banker.find().populate("rm").exec();
 

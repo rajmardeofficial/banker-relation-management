@@ -14,65 +14,53 @@ const mongoose = require("mongoose");
 const { ObjectId } = require("mongodb");
 const RM = require("../model/rmschema");
 const changepassword = require("../utils/changepassword");
+const session = require('express-session')
+
 
 //Approval Function
 function checkApproval(req, res, next) {
-  const { email } = req.body;
+  const { email } = req.session.user
 
-  Banker.find({ email })
-    .then((result) => {
-      if (result && result.length > 0) {
-        if (result[0].approval) {
-          next();
-        } else {
-          res.send(
-            "You are not approved as Banker; please wait for the approval..."
-          );
-        }
+  console.log("from checkApproval " + email);
+
+  try {
+    Banker.findOne({ email }).then((result) => {
+      if (result && result.approval) {
+        next();
       } else {
-        res.status(404).send("Banker not found");
+        res.status(403).send("You are not approved as Banker; please wait for approval");
       }
     })
-    .catch((err) => {
-      console.error("Error while checking approval:", err);
-      res.status(500).send("Internal Server Error");
-    });
-}
-
-async function authenticateToken(req, res, next) {
-  const token = req.cookies.jwt;
-  if (!token) {
-    return res.status(401).send("No token found");
-  }
-
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, banker) => {
-    if (err) {
-      console.log("Token verification failed:", err.message);
-      return res.status(403).send("Token invalid");
-    }
-
-    req.banker = banker;
-    next();
-  });
-}
-
-async function bankerCheck(req, res, next) {
-  if (!req.banker || !req.banker.id) {
-    return res.send("Invalid banker ID");
-  }
-
-  const bankerId = new ObjectId(req.banker.id);
-  try {
-    const bankerData = await Banker.findById(bankerId);
-    if (!bankerData) {
-      return res.send("Invalid banker id");
-    }
-    next();
   } catch (err) {
-    console.log(err);
+    console.error("Error while checking approval:", err);
     res.status(500).send("Internal Server Error");
   }
 }
+
+function bankerCheck(req, res, next) {
+  const user = req.session.user;
+
+  // Check if user is defined and has an 'id' property
+  if (!user || !user.id) {
+    return res.status(403).send("You are not a Banker or You are not logged in <a href='/banker/login'>login</a>");
+  }
+
+  try {
+    Banker.findById(user.id).then((result, err) => {
+      if (result) {
+        // User is a banker, proceed to the next middleware
+        next();
+      } else {
+        // User is not a banker, send a 403 Forbidden response
+        res.status(403).send("You are not a Banker");
+      }
+    });
+  } catch (e) {
+    console.error("Error checking banker status:", e);
+    res.status(500).send("Internal Server Error");
+  }
+}
+
 
 // Banker Signup
 
@@ -122,9 +110,8 @@ router.post("/signup", async (req, res) => {
 });
 
 // Banker Login
-router.post("/login", checkApproval, (req, res) => {
-  let banker;
-  login(banker, Banker, req, res, "/banker/dashboard");
+router.post("/login", (req, res) => {
+  login(Banker, req, res, "/banker/dashboard");
 });
 
 // Function to verify JWT Token
@@ -172,7 +159,7 @@ router.post("/login", checkApproval, (req, res) => {
 //   }
 // }
 
-router.post("/editLead/:id/:serviceId", async (req, res) => {
+router.post("/editLead/:id/:serviceId", bankerCheck, checkApproval, async (req, res) => {
   try {
     const { firstName, lastName, phone, service, amount, remark, status } =
       req.body;
@@ -232,7 +219,7 @@ router.post("/editLead/:id/:serviceId", async (req, res) => {
 
 // withdraw lead
 
-router.post("/withdrawLead/:id", (req, res) => {
+router.post("/withdrawLead/:id", bankerCheck, checkApproval, (req, res) => {
   const id = req.params.id;
   Lead.findByIdAndUpdate(id, { isActive: false }).then((results, err) => {
     if (!err) {
@@ -243,7 +230,7 @@ router.post("/withdrawLead/:id", (req, res) => {
   });
 });
 
-router.post("/createLead", authenticateToken, bankerCheck, async (req, res) => {
+router.post("/createLead", bankerCheck, checkApproval, async (req, res) => {
   try {
     // Extract data from the request body
     const { firstName, lastName, phone, services } = req.body;
@@ -301,7 +288,7 @@ router.post("/createLead", authenticateToken, bankerCheck, async (req, res) => {
       phone,
       services: updatedServices,
       payoutAmount,
-      banker: req.banker.id,
+      banker: req.session.user.id,
       createdby: "banker",
       // Add other lead properties as needed
     });
@@ -310,7 +297,7 @@ router.post("/createLead", authenticateToken, bankerCheck, async (req, res) => {
     await lead.save();
 
     // Find the associated Banker by their ID
-    const bankerId = req.banker.id;
+    const bankerId = req.session.user.id;
     const banker = await Banker.findById(bankerId);
 
     if (!banker) {
@@ -336,7 +323,7 @@ router.post("/createLead", authenticateToken, bankerCheck, async (req, res) => {
 // Check if person is banker
 
 //Create Lead GET request
-router.get("/createLead", authenticateToken, bankerCheck, (req, res) => {
+router.get("/createLead", bankerCheck, checkApproval, (req, res) => {
   Service.find().then((result, err) => {
     if (!err) {
       res.render("CreateLead/createlead", { result });
@@ -350,7 +337,7 @@ router.get("/createLead", authenticateToken, bankerCheck, (req, res) => {
 
 //GET for banker dashboard
 
-router.get("/dashboard", authenticateToken, bankerCheck, (req, res) => {
+router.get("/dashboard", bankerCheck, checkApproval, (req, res) => {
   res.render("DashBoard/BankerHomeDashBoard");
 });
 
@@ -367,17 +354,16 @@ router.get("/signup", (req, res) => {
 // GET Banker TrackEarning Page
 router.get(
   "/trackearning",
-  authenticateToken,
-  bankerCheck,
+
+  bankerCheck, checkApproval,
   async (req, res) => {
     try {
-      const bankerLeads = await Banker.findById(req.banker.id).populate(
+      const bankerLeads = await Banker.findById(req.session.user.id).populate(
         "leads"
       );
 
       console.log(bankerLeads);
       const leads = bankerLeads.leads.map((lead) => lead);
-      ``;
 
       res.render("TrackEarning/trackearning", { leads });
     } catch (error) {
@@ -388,10 +374,10 @@ router.get(
 );
 
 // GET Banker TrackLead Page
-router.get("/tracklead", authenticateToken, bankerCheck, async (req, res) => {
+router.get("/tracklead", bankerCheck, checkApproval, async (req, res) => {
   try {
-    console.log(req.banker.id);
-    const bankerLeads = await Banker.findById(req.banker.id).populate("leads");
+    console.log(req.session.user.id);
+    const bankerLeads = await Banker.findById(req.session.user.id).populate("leads");
     const leads = bankerLeads.leads.map((lead) => lead);
     res.render("TrackLead/tracklead", { leads });
   } catch (error) {
@@ -402,8 +388,8 @@ router.get("/tracklead", authenticateToken, bankerCheck, async (req, res) => {
 
 router.get(
   "/editLead/:id/:serviceId",
-  authenticateToken,
-  bankerCheck,
+
+  bankerCheck, checkApproval,
   async (req, res) => {
     try {
       const id = req.params.id;
@@ -446,7 +432,7 @@ router.get(
 );
 
 // Download excel sheet here
-router.get("/download", authenticateToken, bankerCheck, async (req, res) => {
+router.get("/download", bankerCheck, checkApproval, async (req, res) => {
   try {
     // Fetch leads data from the database
     const leads = await Lead.find();
@@ -496,13 +482,13 @@ router.post("/forgotpassword", (req, res) => {
 });
 
 //change password
-router.post("/changePassword", authenticateToken, bankerCheck, (req, res) => {
-  changepassword(Banker, req, res, req.banker.id);
+router.post("/changePassword", bankerCheck, checkApproval, (req, res) => {
+  changepassword(Banker, req, res, req.session.user.id);
 });
 
 //See profile
-router.get("/profile", authenticateToken, bankerCheck, (req, res) => {
-  Banker.findById(req.banker.id).then((banker) => {
+router.get("/profile", bankerCheck, checkApproval, (req, res) => {
+  Banker.findById(req.session.user.id).then((banker) => {
     RM.findById(banker.rm).then((rm) => {
       console.log(rm);
       res.render("Profile/Profile", { banker, rm });
@@ -511,15 +497,15 @@ router.get("/profile", authenticateToken, bankerCheck, (req, res) => {
 });
 
 //Edit Profile
-router.get("/editProfile", authenticateToken, bankerCheck, async (req, res) => {
-  const id = req.banker.id;
+router.get("/editProfile", bankerCheck, checkApproval, async (req, res) => {
+  const id = req.session.user.id;
   const banker = await Banker.findById(id);
   console.log(banker);
   res.render("EditBankerProfile/editProfile", { banker, id });
 });
 
 //Edit Profile
-router.post("/editProfile/:id", (req, res) => {
+router.post("/editProfile/:id", bankerCheck, checkApproval, (req, res) => {
   const id = req.params.id;
   const { firstName, lastName, email, phone, pan, accountNumber, ifsc } =
     req.body;

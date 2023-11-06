@@ -8,43 +8,34 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const forgotPassword = require("../utils/forgotpassword");
 const mongoose = require("mongoose");
+const session = require('express-session')
+
 
 //Function to check RM
 
 function rmCheck(req, res, next) {
-  RM.findById(req.rm.id)
-    .then((result) => {
-      // console.log(result);
-      if (result) {
-        next();
-      } else {
-        return res.status(403).send("You are not a RM");
-      }
-    })
-    .catch((error) => {
-      console.error("Error finding RM by ID:", error);
-      res.status(500).send("Internal server error");
-    });
-}
-
-// Authenticate Token
-
-function authenticateToken(req, res, next) {
-  const token = req.cookies.jwt;
-  console.log(token);
-  if (!token) {
-    return res.status(401).send("No token found"); // Send a response and return
+  const user = req.session.user;
+  if (!user) {
+    return res.status(403).send("Unauthorized: User not logged in");
   }
 
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, rm) => {
-    if (err) {
-      console.log('Token verification failed:', err.message);
-      return res.status(403).send("Token invalid");
-    }
-    req.rm = rm;
-    next(); // Call next to continue to the next middleware/route
-  });
+  try {
+    RM.findById(user.id).then((result, err) => {
+      if (result) {
+        // User is an admin, proceed to the next middleware
+        // console.log("from admincheck " + result);
+        next();
+      } else {
+        // User is not an admin, send a 403 Forbidden response
+        res.status(403).send("You are not an Relation Manager");
+      }
+    })
+  } catch (e) {
+    console.error("Error checking admin status:", e);
+    res.status(500).send("Internal Server Error");
+  }
 }
+
 
 //Generate Id
 // async function generateLeadId() {
@@ -93,12 +84,11 @@ function authenticateToken(req, res, next) {
 //Login
 
 router.post("/login", (req, res) => {
-  let rm;
-  login(rm, RM, req, res, "/rm/dashboard");
+  login(RM, req, res, "/rm/dashboard");
 });
 
 //Create Lead on behalf of Banker
-router.post("/createLead", authenticateToken, async (req, res) => {
+router.post("/createLead", rmCheck,  async (req, res) => {
   try {
     // Extract data from the request body
     const { firstName, lastName, phone, services, bankersId, paymentStatus } = req.body;
@@ -198,7 +188,7 @@ router.post("/createLead", authenticateToken, async (req, res) => {
 
 //Edit Lead
 
-router.post("/editLead/:id/:serviceId", async (req, res) => {
+router.post("/editLead/:id/:serviceId",rmCheck, async (req, res) => {
   try {
     const { firstName, lastName, phone, service, amount, remark, status, paymentStatus } =
       req.body;
@@ -258,7 +248,7 @@ router.post("/editLead/:id/:serviceId", async (req, res) => {
 
 // withdraw lead
 
-router.get("/withdrawLead/:id/:serviceId", async (req, res) => {
+router.get("/withdrawLead/:id/:serviceId",rmCheck, async (req, res) => {
   const leadId = req.params.id;
   const serviceId = req.params.serviceId;
 
@@ -292,9 +282,9 @@ router.get("/withdrawLead/:id/:serviceId", async (req, res) => {
 
 // GET create Lead
 
-router.get("/createLead", authenticateToken, rmCheck, (req, res) => {
+router.get("/createLead",  rmCheck, (req, res) => {
   try {
-    Banker.find({ rm: req.rm.id }).then((banker) => {
+    Banker.find({ rm: req.session.user.id }).then((banker) => {
       console.log(banker);
       Service.find().then((result, err) => {
         if (!err) {
@@ -312,9 +302,9 @@ router.get("/createLead", authenticateToken, rmCheck, (req, res) => {
 });
 
 // Helper function to convert bankers object to array
-router.get("/trackLead", authenticateToken, rmCheck, async (req, res) => {
+router.get("/trackLead",  rmCheck, async (req, res) => {
   try {
-    const rmObjectId = new mongoose.Types.ObjectId(req.rm.id);
+    const rmObjectId = new mongoose.Types.ObjectId(req.session.user.id);
 
     const result = await RM.aggregate([
       { $match: { _id: rmObjectId } },
@@ -382,7 +372,7 @@ router.get("/trackLead", authenticateToken, rmCheck, async (req, res) => {
 
 //Edit Lead
 
-router.get("/editLead/:id/:serviceId", async (req, res) => {
+router.get("/editLead/:id/:serviceId",rmCheck, async (req, res) => {
   try {
     const id = req.params.id;
     const serviceId = req.params.serviceId;
@@ -430,13 +420,13 @@ router.get("/login", (req, res) => {
 
 //Dashboard Get
 
-router.get("/dashboard", (req, res) => {
+router.get("/dashboard",rmCheck, (req, res) => {
   res.render("DashboardRM/dashboard");
 });
 
 // LOGOUT //
 
-router.get("/logout", (req, res) => {
+router.get("/logout",rmCheck, (req, res) => {
   logout(req, res, "/rm/login");
 });
 

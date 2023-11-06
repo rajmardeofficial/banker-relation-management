@@ -163,25 +163,25 @@ async function authenticateToken(req, res, next) {
     return res.status(401).send("No token found");
   }
 
-  // jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, admin) => {
-  //   if (err) {
-  //     console.log("Token verification failed:", err.message);
-  //     return res.status(403).send("Token invalid");
-  //   }
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, admin) => {
+    if (err) {
+      console.log("Token verification failed:", err.message);
+      return res.status(403).send("Token invalid");
+    }
 
-  //   req.admin = admin;
-  //   next();
-  // });
-
-  try {
-    const jwtVerify = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    // console.log("verified :" + JSON.stringify(jwtVerify));
-    req.admin = jwtVerify;
+    req.admin = admin;
     next();
-  } catch (e) {
-    console.log(e);
-    res.send("Some error occured");
-  }
+  });
+
+  // try {
+  //   const jwtVerify = await jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+  //   // console.log("verified :" + JSON.stringify(jwtVerify));
+  //   req.admin = jwtVerify;
+  //   next();
+  // } catch (e) {
+  //   console.log(e);
+  //   res.send("Some error occured");
+  // }
 }
 
 // Signup

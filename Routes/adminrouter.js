@@ -57,30 +57,6 @@ async function authenticateToken(req, res, next) {
     next();
   });
 
-  // Check if person is admin
-
-  async function adminCheck(req, res, next) {
-    // console.log('req.admin=', req.admin)
-    const adminId = new ObjectId(req.admin.id);
-    // Admin.findById(req.admin.id).then((results) => {
-    //   console.log(results);
-
-    //   if (results) next();
-    //   else return res.send("You are not a admin");
-    // });
-
-    try {
-      const adminData = await Admin.findById(adminId);
-      if (!adminData) {
-        return res.send("Invalid Admin id");
-      }
-      next();
-    } catch (err) {
-      console.log(err);
-      res.status(500).send("Internal Server Error");
-    }
-  }
-
 
 
   // POST route to handle admin approval
@@ -121,6 +97,10 @@ async function authenticateToken(req, res, next) {
       }
     }
   );
+
+  // Check if person is admin
+
+
 
   // POST route to handle banker approval
   router.post(
@@ -193,6 +173,29 @@ async function authenticateToken(req, res, next) {
 router.get("/signup", (req, res) => {
   res.render("signupAdmin/signup");
 });
+
+
+async function adminCheck(req, res, next) {
+  // console.log('req.admin=', req.admin)
+  const adminId = new ObjectId(req.admin.id);
+  // Admin.findById(req.admin.id).then((results) => {
+  //   console.log(results);
+
+  //   if (results) next();
+  //   else return res.send("You are not a admin");
+  // });
+
+  try {
+    const adminData = await Admin.findById(adminId);
+    if (!adminData) {
+      return res.send("Invalid Admin id");
+    }
+    next();
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Internal Server Error");
+  }
+}
 
 // Add relationship manager
 

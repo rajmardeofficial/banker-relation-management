@@ -2,11 +2,12 @@ require('dotenv').config()
 const nodemailer = require("nodemailer");
 
 const mailTransporter = nodemailer.createTransport({
+  service: "gmail",
   host: 'smtpout.secureserver.net', // Replace with your provider's SMTP server
-  port: 465, // Use the appropriate port for your provider (465 for secure connection)
+  // port: 465, // Use the appropriate port for your provider (465 for secure connection)
   secure: true, // Use SSL/TLS
   auth: {
-    user: "contact@bankerspartner.com",
+    user: "harshad.hmbizsolutions@gmail.com",
     pass: process.env.NODEMAILER_PASSWORD
   }
 });
@@ -14,7 +15,7 @@ const mailTransporter = nodemailer.createTransport({
 // Define a function to send emails
 function sendEmail(to, subject, text, callback) {
   const mailDetails = {
-    from: "contact@bankerspartner.com",
+    from: "harshad.hmbizsolutions@gmail.com",
     to: to,
     subject: subject,
     html: text,

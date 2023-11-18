@@ -18,10 +18,7 @@
       crossorigin="anonymous"
     />
     <style>
-      .card-header {
-        text-align: center;
-      }
-
+      .card-header,
       .card-body {
         text-align: center;
       }
@@ -33,6 +30,13 @@
         margin-right: 10px; /* Add margin to the right */
       }
 
+      .btn-danger.float-end {
+        position: absolute;
+        top: 10px;
+        right: 80px;
+        margin-right: 10px; /* Add margin to the right */
+      }
+
       .container {
         margin-top: 20px; /* Add margin to the top */
       }
@@ -40,12 +44,19 @@
   </head>
   <body>
     <div class="container">
-      <h2 style="text-align: center">Dashboard</h2>
       <div class="row">
-        <div class="col-md-12">
+        <h2 style="">Dashboard</h2>
+        <div class="col-md-3">
           <a href="/banker/profile" class="btn btn-info float-end"
             ><i class="fa-solid fa-user" style="margin-right: 5px"></i
             >Profile</a
+          >
+          <a
+            href="/banker/logout"
+            class="btn btn-danger float-end"
+            style="right: 120px"
+            ><i class="fa-solid fa-sign-out-alt" style="margin-right: 5px"></i
+            >Logout</a
           >
         </div>
       </div>

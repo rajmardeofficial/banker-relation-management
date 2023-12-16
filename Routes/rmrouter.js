@@ -128,12 +128,12 @@ router.post("/createLead", rmCheck,  async (req, res) => {
       }
 
       const extraAmount = userAmount - standardFees;
-      const extraPercentage = 0.6; // 60%
+      // const extraPercentage = 0.6; // 60%
 
       // Calculate the payout for each service
       const servicePayout =
-        standardFees * 0.4 +
-        (extraAmount > 0 ? extraAmount * extraPercentage : 0);
+        (standardFees + extraAmount) * 0.25 
+        // (extraAmount > 0 ? extraAmount * extraPercentage : 0);
 
       // Add the payout for the current service to the total payout
       payoutAmount += servicePayout;
@@ -200,7 +200,8 @@ router.post("/editLead/:id/:serviceId",rmCheck, async (req, res) => {
 
     // Calculate extra amount and payout amount
     const extraAmount = amount - serviceFromDb.standardFees;
-    const payoutAmount = serviceFromDb.standardFees * 0.4 + extraAmount * 0.6;
+    // const payoutAmount = serviceFromDb.standardFees * 0.4 + extraAmount * 0.6;
+    const payoutAmount = (serviceFromDb.standardFees + extraAmount) * 0.25;
     // console.log("extraAmount: " + extraAmount);
     // console.log("40 per of standard fees: " + serviceFromDb.standardFees * 0.4);
     // console.log("60 per of extra amount: " + extraAmount * 0.6);

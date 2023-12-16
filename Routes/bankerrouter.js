@@ -172,9 +172,9 @@ router.post("/editLead/:id/:serviceId", bankerCheck, checkApproval, async (req, 
 
     // Calculate extra amount and payout amount
     const extraAmount = amount - serviceFromDb.standardFees;
-    const payoutAmount = serviceFromDb.standardFees * 0.4 + extraAmount * 0.6;
+    const payoutAmount = serviceFromDb.standardFees * 0.25 + extraAmount * 0.6;
     console.log("extraAmount: " + extraAmount);
-    console.log("40 per of standard fees: " + serviceFromDb.standardFees * 0.4);
+    console.log("40 per of standard fees: " + serviceFromDb.standardFees * 0.25);
     console.log("60 per of extra amount: " + extraAmount * 0.6);
     console.log("payoutAmount: " + payoutAmount);
 
@@ -264,15 +264,16 @@ router.post("/createLead", bankerCheck, checkApproval, async (req, res) => {
       }
 
       const extraAmount = userAmount - standardFees;
-      const extraPercentage = 0.6; // 60%
+      // const extraPercentage = 0.6; // 60%
 
       // Calculate the payout for each service
       const servicePayout =
-        standardFees * 0.4 +
-        (extraAmount > 0 ? extraAmount * extraPercentage : 0);
+        (standardFees + extraAmount) * 0.25 
+        // (extraAmount > 0 ? extraAmount * extraPercentage : 0);
 
       // Add the payout for the current service to the total payout
       payoutAmount += servicePayout;
+      console.log(payoutAmount);
 
       // Return the updated service object
       return {
@@ -287,7 +288,7 @@ router.post("/createLead", bankerCheck, checkApproval, async (req, res) => {
       lastName,
       phone,
       services: updatedServices,
-      payoutAmount,
+      payoutAmount: payoutAmount,
       banker: req.session.user.id,
       createdby: "banker",
       // Add other lead properties as needed

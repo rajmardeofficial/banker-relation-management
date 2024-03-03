@@ -38,6 +38,8 @@ app.get('*', function (req, res) {
   res.render('404/404');
 });
 
+//This is the test command
+
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server started on port ${PORT}`);
 });
